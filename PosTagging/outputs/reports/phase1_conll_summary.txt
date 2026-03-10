@@ -1,0 +1,27 @@
+FASE I - RESUMEN CONLL2002
+========================================
+Dataset: CoNLL2002
+Train sentences: 8323
+Validation sentences: 1915
+Test sentences: 1517
+Word vocab size: 26101
+Tag vocab size: 61
+Max length: 1238
+Batch size: 32
+
+Observación importante:
+- CoNLL2002 tiene oraciones extremadamente largas.
+- max_len observado en train: 1238
+- Conviene revisar truncamiento o percentiles antes del entrenamiento.
+
+Artefactos generados:
+- outputs/artifacts/conll_word2idx.json
+- outputs/artifacts/conll_tag2idx.json
+
+Objetos disponibles para entrenamiento:
+- train_loader
+- val_loader
+- test_loader
+- word2idx
+- tag2idx
+- max_len
