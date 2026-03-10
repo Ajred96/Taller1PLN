@@ -1,76 +1,524 @@
+# Aquí tienes \*\*todo el README completo listo para copiar y pegar directamente\*\* en tu `README.md` sin tener que unir partes.
+
+# 
+
+# ```md
+
 # \# POS Tagging en Español
 
 # 
 
-# Proyecto para implementar la Fase I de preprocesamiento del taller de POS Tagging.
+# Proyecto del curso de Procesamiento de Lenguaje Natural para implementar un sistema de \*\*POS Tagging\*\* utilizando modelos basados en \*\*BiLSTM\*\* sobre datasets en español.
 
 # 
 
-# \## Alcance de esta fase
-
-# La Fase I incluye:
+# El proyecto está dividido en varias fases que se desarrollarán progresivamente por los integrantes del equipo.
 
 # 
 
-# \- carga de datasets
+# ---
 
-# \- limpieza
+# 
 
-# \- construcción de secuencias por oración
+# \# Objetivo del proyecto
 
-# \- creación de vocabulario
+# 
+
+# Construir y evaluar modelos de etiquetado gramatical (\*\*Part-of-Speech Tagging\*\*) para español utilizando:
+
+# 
+
+# \- Dataset \*\*Ancora\*\*
+
+# \- Dataset \*\*CoNLL2002\*\*
+
+# 
+
+# El pipeline completo del proyecto incluirá:
+
+# 
+
+# 1\. Preprocesamiento de datos  
+
+# 2\. Construcción de vocabularios  
+
+# 3\. Modelos de Deep Learning (BiLSTM)  
+
+# 4\. Entrenamiento  
+
+# 5\. Evaluación  
+
+# 
+
+# ---
+
+# 
+
+# \# Estado actual del repositorio
+
+# 
+
+# Actualmente se ha completado la \*\*FASE I: Preprocesamiento de los datasets\*\*.
+
+# 
+
+# Las siguientes fases del proyecto serán implementadas posteriormente por otros integrantes del equipo.
+
+# 
+
+# ---
+
+# 
+
+# \# Fase I — Preprocesamiento de datos
+
+# 
+
+# El código de esta fase se encuentra en:
+
+# 
+
+# ```
+
+# 
+
+# src/preprocessing/
+
+# 
+
+# ```
+
+# 
+
+# Esta fase incluye:
+
+# 
+
+# \- carga de datasets  
+
+# \- limpieza de datos  
+
+# \- construcción de secuencias de oraciones  
+
+# \- creación de vocabularios  
+
+# \- indexación de palabras y etiquetas  
+
+# \- partición de datos  
+
+# \- padding de secuencias  
+
+# \- creación de máscaras  
+
+# \- construcción de `Dataset` y `DataLoader` para PyTorch  
+
+# 
+
+# El objetivo de esta fase es dejar los datos \*\*listos para ser utilizados por los modelos de entrenamiento en las siguientes etapas del proyecto\*\*.
+
+# 
+
+# ---
+
+# 
+
+# \# Datasets utilizados
+
+# 
+
+# \## Ancora
+
+# 
+
+# Formato original del dataset:
+
+# 
+
+# ```
+
+# 
+
+# Sentence #
+
+# Word
+
+# POS
+
+# 
+
+# ```
+
+# 
+
+# Pipeline aplicado:
+
+# 
+
+# \- limpieza de columnas
+
+# \- construcción de oraciones usando `Sentence #`
+
+# \- split train / validation / test = \*\*70 / 15 / 15\*\*
+
+# \- vocabulario de palabras construido solo con train
+
+# \- indexación de palabras y etiquetas
+
+# \- padding de secuencias
+
+# \- generación de máscaras
+
+# \- construcción de `Dataset` y `DataLoader`
+
+# 
+
+# Resumen del dataset procesado:
+
+# 
+
+# ```
+
+# 
+
+# Oraciones totales: 17345
+
+# Vocabulario de palabras (train): 36131
+
+# Etiquetas POS: 17
+
+# Max sequence length: 148
+
+# 
+
+# ```
+
+# 
+
+# ---
+
+# 
+
+# \## CoNLL2002
+
+# 
+
+# Formato original del dataset:
+
+# 
+
+# ```
+
+# 
+
+# Word POS NER
+
+# 
+
+# ```
+
+# 
+
+# Las oraciones están separadas por \*\*líneas vacías\*\*.
+
+# 
+
+# Pipeline aplicado:
+
+# 
+
+# \- lectura de `train.txt`, `valid.txt`, `test.txt`
+
+# \- construcción de oraciones por separación de líneas vacías
+
+# \- vocabulario de palabras construido solo con train
+
+# \- vocabulario POS construido solo con train
+
+# \- soporte para etiquetas desconocidas (`<UNK\_TAG>`)
 
 # \- indexación
 
-# \- partición train / validation / test
-
 # \- padding
 
-# \- máscaras
+# \- generación de máscaras
 
-# \- Dataset y DataLoader de PyTorch
-
-# 
-
-# \## Datasets
-
-# \- Ancora
-
-# \- CoNLL2002
+# \- construcción de `Dataset` y `DataLoader`
 
 # 
 
-# \## Estructura del proyecto
+# Resumen del dataset procesado:
 
 # 
 
-# ```text
+# ```
+
+# 
+
+# Train sentences: 8323
+
+# Validation sentences: 1915
+
+# Test sentences: 1517
+
+# Vocabulario de palabras: 26101
+
+# Vocabulario de etiquetas POS: 61
+
+# Max sequence length: 1238
+
+# 
+
+# ```
+
+# 
+
+# Nota:  
+
+# CoNLL2002 contiene secuencias muy largas, por lo que en fases posteriores puede ser necesario aplicar \*\*truncamiento o limitar la longitud máxima\*\* para mejorar eficiencia durante el entrenamiento.
+
+# 
+
+# ---
+
+# 
+
+# \# Estructura del proyecto
+
+# 
+
+# ```
+
+# 
 
 # data/
 
-# &nbsp; raw/
+# ├── raw/
 
-# &nbsp;   ancora/
+# │   ├── ancora/
 
-# &nbsp;   conll2002/
+# │   │   └── ancora\_corpus\_pos.csv
 
-# &nbsp; processed/
+# │   └── conll2002/
+
+# │       ├── train.txt
+
+# │       ├── valid.txt
+
+# │       └── test.txt
 
 # 
 
 # src/
 
-# &nbsp; preprocessing/
+# ├── preprocessing/
 
-# &nbsp; models/
+# ├── models/
 
-# &nbsp; training/
+# └── training/
 
 # 
 
 # outputs/
 
-# &nbsp; artifacts/
+# ├── artifacts/
 
-# &nbsp; reports/
+# └── reports/
+
+# 
+
+# ```
+
+# 
+
+# ---
+
+# 
+
+# \# Scripts principales
+
+# 
+
+# Para ejecutar el preprocesamiento completo:
+
+# 
+
+# ```
+
+# 
+
+# src/preprocessing/run\_phase1\_all.py
+
+# 
+
+# ```
+
+# 
+
+# También es posible ejecutar cada dataset por separado:
+
+# 
+
+# ```
+
+# 
+
+# src/preprocessing/run\_phase1\_ancora.py
+
+# src/preprocessing/run\_phase1\_conll.py
+
+# 
+
+# ````
+
+# 
+
+# ---
+
+# 
+
+# \# Cómo ejecutar la Fase I
+
+# 
+
+# Desde la raíz del proyecto:
+
+# 
+
+# ```bash
+
+# python src/preprocessing/run\_phase1\_all.py
+
+# ````
+
+# 
+
+# Esto generará los artefactos de preprocesamiento y los reportes correspondientes.
+
+# 
+
+# ---
+
+# 
+
+# \# Artefactos generados
+
+# 
+
+# Los artefactos generados por la Fase I se guardan en:
+
+# 
+
+# ```
+
+# outputs/artifacts/
+
+# ```
+
+# 
+
+# Incluyen:
+
+# 
+
+# \* vocabulario de palabras
+
+# \* vocabulario de etiquetas POS
+
+# 
+
+# Reportes generados:
+
+# 
+
+# ```
+
+# outputs/reports/
+
+# ```
+
+# 
+
+# \* `phase1\_ancora\_summary.txt`
+
+# \* `phase1\_conll\_summary.txt`
+
+# \* `phase1\_handoff.md`
+
+# 
+
+# ---
+
+# 
+
+# \# Nota importante sobre los datasets
+
+# 
+
+# Ancora y CoNLL2002 \*\*no utilizan el mismo esquema de etiquetas POS\*\*.
+
+# 
+
+# Ancora usa etiquetas universales como:
+
+# 
+
+# ```
+
+# NOUN, VERB, DET, ADJ, ADV
+
+# ```
+
+# 
+
+# Mientras que CoNLL2002 utiliza etiquetas tipo \*\*EAGLES\*\*, por ejemplo:
+
+# 
+
+# ```
+
+# NC, NP, DA, AQ, VMI, RG
+
+# ```
+
+# 
+
+# Por lo tanto, \*\*no deben mezclarse directamente sin definir previamente un mapeo de etiquetas\*\*.
+
+# 
+
+# ---
+
+# 
+
+# \# Próximas fases del proyecto
+
+# 
+
+# Las siguientes etapas del proyecto incluirán:
+
+# 
+
+# \* implementación de modelos BiLSTM
+
+# \* entrenamiento del modelo
+
+# \* evaluación
+
+# \* comparación entre datasets
+
+# 
+
+# Estas fases serán desarrolladas por otros integrantes del equipo.
+
+# 
+
+# ---
+
+# 
+
+# \# Integrantes del equipo
+
+# 
+
+# Anderson Johan Alban Angulo - Preprocesamiento
 
