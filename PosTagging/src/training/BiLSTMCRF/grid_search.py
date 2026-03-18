@@ -10,19 +10,33 @@ from model import BiLSTMCRFTagger
 from train import train_model
 
 
-def run_grid_search(train_ds, val_ds, vocab_size, tagset_size, dataset_name, device):
+def run_grid_search(train_ds, val_ds, vocab_size, tagset_size, dataset_name, device, smoke_test=False):
     """
     Ejecuta grid search sobre todas las combinaciones de hiperparámetros.
     Idéntico al del modelo base salvo que instancia BiLSTMCRFTagger.
+
+    Si smoke_test=True corre una sola combinación mínima (2 epochs, patience=1)
+    para verificar que el pipeline funciona sin errores antes del entrenamiento real.
     """
 
-    batch_sizes = [16, 32, 64]
-    optimizers_config = [
-        {"name": "Adam", "lr": 0.001},
-        {"name": "SGD",  "lr": 0.01, "momentum": 0.9}
-    ]
-    embedding_dims = [100, 300]
-    hidden_dims = [128, 256]
+    if smoke_test:
+        batch_sizes = [32]
+        optimizers_config = [{"name": "Adam", "lr": 0.001}]
+        embedding_dims = [100]
+        hidden_dims = [128]
+        epochs = 2
+        patience = 1
+        print(f"  [SMOKE TEST activo] 1 combinación, {epochs} epochs, patience={patience}.")
+    else:
+        batch_sizes = [16, 32, 64]
+        optimizers_config = [
+            {"name": "Adam", "lr": 0.001},
+            {"name": "SGD",  "lr": 0.01, "momentum": 0.9}
+        ]
+        embedding_dims = [100, 300]
+        hidden_dims = [128, 256]
+        epochs = 50
+        patience = 5
 
     results = []
     best_val_loss = float('inf')
@@ -42,7 +56,6 @@ def run_grid_search(train_ds, val_ds, vocab_size, tagset_size, dataset_name, dev
                     combo += 1
                     print(f"\n[{dataset_name}] {combo}/{total}: bs={bs}, opt={opt_cfg['name']}, emb={emb_dim}, hid={hid_dim}")
 
-                    # Única diferencia respecto al modelo base: BiLSTMCRFTagger
                     model = BiLSTMCRFTagger(vocab_size, tagset_size, emb_dim, hid_dim)
 
                     if opt_cfg["name"] == "Adam":
@@ -52,7 +65,8 @@ def run_grid_search(train_ds, val_ds, vocab_size, tagset_size, dataset_name, dev
 
                     start = time.time()
                     trained_model, t_losses, v_losses, val_loss = train_model(
-                        model, train_loader, val_loader, optimizer, device, epochs=50, patience=5
+                        model, train_loader, val_loader, optimizer, device,
+                        epochs=epochs, patience=patience
                     )
                     elapsed = time.time() - start
 

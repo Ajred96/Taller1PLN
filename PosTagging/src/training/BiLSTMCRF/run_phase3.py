@@ -24,29 +24,37 @@ from predict import print_prediction
 
 
 # ════════════════════════════════════════════════════════════════
-# CONFIGURACIÓN — Ajusta estos valores si necesitas acelerar
-# el entrenamiento. Los valores por defecto no alteran nada.
+# CONFIGURACIÓN — Ajusta estos valores según tus necesidades.
+# Los valores por defecto reproducen el comportamiento completo
+# sin ninguna modificación sobre los datos.
 # ════════════════════════════════════════════════════════════════
+
+# SMOKE_TEST
+# Si es True, ignora el grid search completo y corre una sola
+# combinación con parámetros mínimos (2 epochs, patience=1)
+# para verificar que el pipeline funciona de principio a fin.
+# Combínalo con TRAIN_SUBSET_* = 0.05 para que dure segundos.
+# Ponlo en False para el entrenamiento real.
+SMOKE_TEST = False
 
 # MAX_LEN_CONLL
 # Trunca las secuencias de CoNLL a esta longitud máxima.
 # CoNLL tiene oraciones de hasta 1238 tokens, lo que hace
 # que el algoritmo de Viterbi del CRF sea extremadamente lento.
-# Por defecto es None, lo que significa que se usa el max_len
-# original del dataset sin ningún truncamiento.
+# Por defecto es None: se usa el max_len original sin truncamiento.
 # Ejemplo para acelerar: MAX_LEN_CONLL = 150
 MAX_LEN_CONLL = None
 
 # TRAIN_SUBSET_ANCORA (valor entre 0.0 y 1.0)
 # Fracción del conjunto de entrenamiento de Ancora a usar.
 # 1.0 = usar el 100% de los datos (comportamiento original).
-# Ejemplo para acelerar: TRAIN_SUBSET_ANCORA = 0.5
+# Ejemplo para smoke test o acelerar: TRAIN_SUBSET_ANCORA = 0.05
 TRAIN_SUBSET_ANCORA = 1.0
 
 # TRAIN_SUBSET_CONLL (valor entre 0.0 y 1.0)
 # Fracción del conjunto de entrenamiento de CoNLL a usar.
 # 1.0 = usar el 100% de los datos (comportamiento original).
-# Ejemplo para acelerar: TRAIN_SUBSET_CONLL = 0.5
+# Ejemplo para smoke test o acelerar: TRAIN_SUBSET_CONLL = 0.05
 TRAIN_SUBSET_CONLL = 1.0
 
 # ════════════════════════════════════════════════════════════════
@@ -64,7 +72,7 @@ class POSDataset(Dataset):
     def __init__(self, inputs, labels, masks):
         self.inputs = inputs if isinstance(inputs, torch.Tensor) else torch.tensor(inputs, dtype=torch.long)
         self.labels = labels if isinstance(labels, torch.Tensor) else torch.tensor(labels, dtype=torch.long)
-        self.masks = masks if isinstance(masks,  torch.Tensor) else torch.tensor(masks,  dtype=torch.long)
+        self.masks  = masks  if isinstance(masks,  torch.Tensor) else torch.tensor(masks,  dtype=torch.long)
 
     def __len__(self):
         return len(self.inputs)
@@ -94,7 +102,6 @@ def truncate_tensors(inputs, labels, masks, max_len):
     """
     Recorta inputs, labels y masks a max_len columnas.
     Si max_len es None devuelve los tensores sin cambios.
-    Las máscaras se recalculan para reflejar el truncamiento.
     """
     if max_len is None:
         return inputs, labels, masks
@@ -132,7 +139,7 @@ train_ds_a = apply_subset(train_ds_a, TRAIN_SUBSET_ANCORA)
 print(f"  Ancora: vocab={len(word2idx_a)}, tags={len(tag2idx_a)}, max_len={max_len_a}")
 
 # ── CoNLL2002 ────────────────────────────────────────────────────
-conll = torch.load(os.path.join(processed_dir, "conll_data.pt"), weights_only=False)
+conll      = torch.load(os.path.join(processed_dir, "conll_data.pt"), weights_only=False)
 word2idx_c = conll["word2idx"]
 tag2idx_c = conll["tag2idx"]
 max_len_c = conll["max_len"]
@@ -163,7 +170,8 @@ best_model_a, best_config_a, results_a = run_grid_search(
     vocab_size=len(word2idx_a),
     tagset_size=len(tag2idx_a),
     dataset_name="Ancora",
-    device=device
+    device=device,
+    smoke_test=SMOKE_TEST
 )
 
 test_loader_a = DataLoader(test_ds_a, batch_size=64, shuffle=False)
@@ -199,7 +207,8 @@ best_model_c, best_config_c, results_c = run_grid_search(
     vocab_size=len(word2idx_c),
     tagset_size=len(tag2idx_c),
     dataset_name="CoNLL2002",
-    device=device
+    device=device,
+    smoke_test=SMOKE_TEST
 )
 
 test_loader_c = DataLoader(test_ds_c, batch_size=64, shuffle=False)
@@ -232,19 +241,19 @@ print("=" * 80)
 
 results_table = pd.DataFrame([
     {
-        "Modelo":      "BiLSTM-CRF",
-        "Dataset":     "Ancora",
-        "Accuracy":    f"{eval_a['accuracy']:.4f}",
-        "Macro F1":    f"{eval_a['macro_f1']:.4f}",
-        "Weighted F1": f"{eval_a['weighted_f1']:.4f}",
+        "Modelo":       "BiLSTM-CRF",
+        "Dataset":      "Ancora",
+        "Accuracy":     f"{eval_a['accuracy']:.4f}",
+        "Macro F1":     f"{eval_a['macro_f1']:.4f}",
+        "Weighted F1":  f"{eval_a['weighted_f1']:.4f}",
         "Mejor Config": f"bs={best_config_a['batch_size']}, opt={best_config_a['optimizer']}, emb={best_config_a['embedding_dim']}, hid={best_config_a['hidden_dim']}"
     },
     {
-        "Modelo":      "BiLSTM-CRF",
-        "Dataset":     "CoNLL2002",
-        "Accuracy":    f"{eval_c['accuracy']:.4f}",
-        "Macro F1":    f"{eval_c['macro_f1']:.4f}",
-        "Weighted F1": f"{eval_c['weighted_f1']:.4f}",
+        "Modelo":       "BiLSTM-CRF",
+        "Dataset":      "CoNLL2002",
+        "Accuracy":     f"{eval_c['accuracy']:.4f}",
+        "Macro F1":     f"{eval_c['macro_f1']:.4f}",
+        "Weighted F1":  f"{eval_c['weighted_f1']:.4f}",
         "Mejor Config": f"bs={best_config_c['batch_size']}, opt={best_config_c['optimizer']}, emb={best_config_c['embedding_dim']}, hid={best_config_c['hidden_dim']}"
     }
 ])
