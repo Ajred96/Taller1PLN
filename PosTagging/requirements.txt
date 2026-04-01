@@ -6,3 +6,4 @@ torch
 jupyter
 matplotlib
 seqeval
+pytorch-crf

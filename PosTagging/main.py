@@ -9,6 +9,8 @@ Opciones:
     1. Preprocesar datasets (Fase I)
     2. Entrenar BiLSTM Base (Fase II - BiLSTM Base)
     3. POS Tagging de oración (Modelos entrenados)
+    4. Entrenar BiLSTM-CRF (Fase III)
+    5. POS Tagging de oración (Modelos entrenados - BiLSTM-CRF)
 """
 
 import os
@@ -18,6 +20,7 @@ import subprocess
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 PREPROCESSING_DIR = os.path.join(BASE_DIR, "src", "preprocessing")
 BILSTM_DIR = os.path.join(BASE_DIR, "src", "training", "BiLSTMBase")
+BILSTM_CRF_DIR = os.path.join(BASE_DIR, "src", "training", "BiLSTMCRF")
 PROCESSED_DIR = os.path.join(BASE_DIR, "outputs", "processed")
 MODELS_DIR = os.path.join(BASE_DIR, "outputs", "models")
 
@@ -33,6 +36,12 @@ def check_models():
     """Verifica si los modelos entrenados existen."""
     ancora = os.path.exists(os.path.join(MODELS_DIR, "bilstm_ancora.pt"))
     conll = os.path.exists(os.path.join(MODELS_DIR, "bilstm_conll.pt"))
+    return ancora, conll
+
+
+def check_models_crf():
+    ancora = os.path.exists(os.path.join(MODELS_DIR, "bilstm_crf_ancora.pt"))
+    conll = os.path.exists(os.path.join(MODELS_DIR, "bilstm_crf_conll.pt"))
     return ancora, conll
 
 
@@ -65,6 +74,21 @@ def run_training():
     print("=" * 60)
 
     subprocess.run([sys.executable, "run_phase2.py"], cwd=BILSTM_DIR, check=True)
+
+
+def run_training_crf():
+    """Ejecuta Fase III — BiLSTM-CRF"""
+    if not check_processed():
+        print("\nNo se encontraron datos procesados en outputs/processed/")
+        print("Ejecuta primero la opción 1 (Preprocesar).")
+        return
+
+    print("\n" + "=" * 60)
+    print("FASE III — Entrenamiento BiLSTM-CRF")
+    print("=" * 60)
+
+    subprocess.run([sys.executable, "run_phase3.py"], cwd=BILSTM_CRF_DIR, check=True)
+
 
 
 def run_prediction():
@@ -156,6 +180,86 @@ def run_prediction():
         print()
 
 
+def run_prediction_crf():
+    """Carga modelos BiLSTM-CRF guardados y realiza POS Tagging."""
+    ancora_exists, conll_exists = check_models_crf()
+
+    if not ancora_exists and not conll_exists:
+        print("\nNo se encontraron modelos CRF entrenados en outputs/models/")
+        print("Ejecuta primero la opción 4 (Entrenar BiLSTM-CRF).")
+        return
+
+    import torch
+    sys.path.insert(0, BILSTM_CRF_DIR)
+    from model import BiLSTMCRFTagger
+    from predict import print_prediction as print_prediction_crf
+
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    print(f"\nDispositivo: {device}")
+
+    if not check_processed():
+        print("\nNo se encontraron datos procesados. Ejecuta primero la opción 1.")
+        return
+
+    models = {}
+
+    if ancora_exists:
+        ancora_data = torch.load(os.path.join(PROCESSED_DIR, "ancora_data.pt"), map_location=device, weights_only=False)
+        ckpt_a = torch.load(os.path.join(MODELS_DIR, "bilstm_crf_ancora.pt"), map_location=device, weights_only=False)
+        cfg_a = ckpt_a["best_config"]
+
+        model_a = BiLSTMCRFTagger(
+            vocab_size=ckpt_a["vocab_size"],
+            tagset_size=ckpt_a["tagset_size"],
+            embedding_dim=cfg_a["embedding_dim"],
+            hidden_dim=cfg_a["hidden_dim"]
+        )
+        model_a.load_state_dict(ckpt_a["model_state_dict"])
+        model_a = model_a.to(device)
+
+        models["Ancora"] = {
+            "model":    model_a,
+            "word2idx": ancora_data["word2idx"],
+            "tag2idx":  ancora_data["tag2idx"],
+        }
+        print(f"  BiLSTM-CRF Ancora cargado: {cfg_a}")
+    else:
+        print("  Ancora: modelo CRF no encontrado, se omite.")
+
+    if conll_exists:
+        conll_data = torch.load(os.path.join(PROCESSED_DIR, "conll_data.pt"), map_location=device, weights_only=False)
+        ckpt_c = torch.load(os.path.join(MODELS_DIR, "bilstm_crf_conll.pt"), map_location=device, weights_only=False)
+        cfg_c = ckpt_c["best_config"]
+
+        model_c = BiLSTMCRFTagger(
+            vocab_size=ckpt_c["vocab_size"],
+            tagset_size=ckpt_c["tagset_size"],
+            embedding_dim=cfg_c["embedding_dim"],
+            hidden_dim=cfg_c["hidden_dim"]
+        )
+        model_c.load_state_dict(ckpt_c["model_state_dict"])
+        model_c = model_c.to(device)
+
+        models["CoNLL2002"] = {
+            "model":    model_c,
+            "word2idx": conll_data["word2idx"],
+            "tag2idx":  conll_data["tag2idx"],
+        }
+        print(f"  BiLSTM-CRF CoNLL2002 cargado: {cfg_c}")
+    else:
+        print("  CoNLL2002: modelo CRF no encontrado, se omite.")
+
+    print("\nModelos listos. Escribe 'salir' para volver al menú.\n")
+
+    while True:
+        oracion = input("Oración: ").strip()
+        if oracion.lower() in ("salir", "exit", "q", ""):
+            break
+        for name, m in models.items():
+            print_prediction_crf(oracion, m["model"], m["word2idx"], m["tag2idx"], device, f"BiLSTM-CRF — {name}")
+        print()
+
+
 def main():
     while True:
         print("\n" + "=" * 60)
@@ -165,6 +269,8 @@ def main():
         print("  1. Preprocesar datasets (Fase I)")
         print("  2. Entrenar BiLSTM Base (Fase II)")
         print("  3. POS Tagging de oración (Modelos entrenados)")
+        print("  4. Entrenar BiLSTM-CRF (Fase III)")
+        print("  5. POS Tagging de oración (BiLSTM-CRF)")
         print("  0. Salir")
         print()
 
@@ -176,6 +282,10 @@ def main():
             run_training()
         elif opcion == "3":
             run_prediction()
+        elif opcion == "4":
+            run_training_crf()
+        elif opcion == "5":
+            run_prediction_crf()
         elif opcion == "0":
             print("\nHasta luego.")
             break
