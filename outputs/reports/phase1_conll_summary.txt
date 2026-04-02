@@ -9,7 +9,7 @@ Tag vocab size: 61
 Max length: 1238
 Batch size: 32
 
-Observación importante:
+Observacion importante:
 - CoNLL2002 tiene oraciones extremadamente largas.
 - max_len observado en train: 1238
 - Conviene revisar truncamiento o percentiles antes del entrenamiento.

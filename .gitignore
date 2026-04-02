@@ -4,8 +4,16 @@ __pycache__/
 *.pyo
 *.pyd
 
+# Modelos y datos procesados
+*.pt
+*.bin
+*.pth
+outputs/models/
+outputs/processed/
+
 # Entornos virtuales
 venv/
+.venv/
 .env/
 
 # IDEs

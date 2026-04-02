@@ -1,7 +1,7 @@
 import copy
 import torch
 import torch.nn as nn
-from sklearn.metrics import classification_report, accuracy_score, f1_score
+from sklearn.metrics import classification_report, accuracy_score, f1_score, precision_score, recall_score
 
 
 def train_model(model, train_loader, val_loader, optimizer, device, epochs=50, patience=5):
@@ -108,12 +108,16 @@ def evaluate_model(model, test_loader, tag2idx, device):
                 all_labels.extend([idx2tag.get(t, "<UNK>") for t in true_tags])
 
     accuracy = accuracy_score(all_labels, all_preds)
+    macro_precision = precision_score(all_labels, all_preds, average='macro', zero_division=0)
+    macro_recall = recall_score(all_labels, all_preds, average='macro', zero_division=0)
     macro_f1 = f1_score(all_labels, all_preds, average='macro', zero_division=0)
     weighted_f1 = f1_score(all_labels, all_preds, average='weighted', zero_division=0)
     report = classification_report(all_labels, all_preds, zero_division=0)
 
     return {
         "accuracy": accuracy,
+        "macro_precision": macro_precision,
+        "macro_recall": macro_recall,
         "macro_f1": macro_f1,
         "weighted_f1": weighted_f1,
         "report": report

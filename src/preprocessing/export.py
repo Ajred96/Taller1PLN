@@ -2,17 +2,10 @@
 Exporta los datasets procesados (tensores + vocabularios + max_len)
 como archivos .pt para que las fases de entrenamiento los carguen
 directamente sin reprocesar.
-
-Uso:
-    cd PosTagging/src/preprocessing
-    python export_processed.py
 """
 
 import os
 import torch
-
-from build_dataloaders import build_ancora_dataloaders
-from prepare_conll_pipeline import prepare_conll_pipeline
 
 
 def export_dataset(data, name, output_dir):
@@ -40,25 +33,20 @@ def export_dataset(data, name, output_dir):
 
 
 def main():
-    output_dir = "../../outputs/processed"
-    os.makedirs(output_dir, exist_ok=True)
+    from config import PROCESSED_DIR, ANCORA_PATH, CONLL_TRAIN, CONLL_VALID, CONLL_TEST
+    from .ancora import run_ancora_pipeline
+    from .conll import run_conll_pipeline
+
+    os.makedirs(PROCESSED_DIR, exist_ok=True)
 
     # Ancora
     print("Procesando Ancora...")
-    ancora_path = "../../data/raw/ancora/ancora_corpus_pos.csv"
-    ancora_data = build_ancora_dataloaders(ancora_path, batch_size=32)
-    export_dataset(ancora_data, "ancora", output_dir)
+    ancora_data = run_ancora_pipeline(ANCORA_PATH, batch_size=32)
+    export_dataset(ancora_data, "ancora", PROCESSED_DIR)
 
     # CoNLL2002
     print("Procesando CoNLL2002...")
-    conll_train = "../../data/raw/conll2002/train.txt"
-    conll_valid = "../../data/raw/conll2002/valid.txt"
-    conll_test  = "../../data/raw/conll2002/test.txt"
-    conll_data = prepare_conll_pipeline(conll_train, conll_valid, conll_test, batch_size=32)
-    export_dataset(conll_data, "conll", output_dir)
+    conll_data = run_conll_pipeline(CONLL_TRAIN, CONLL_VALID, CONLL_TEST, batch_size=32)
+    export_dataset(conll_data, "conll", PROCESSED_DIR)
 
     print("\nDatasets exportados a outputs/processed/")
-
-
-if __name__ == "__main__":
-    main()
