@@ -4,6 +4,13 @@ __pycache__/
 *.pyo
 *.pyd
 
+*.pt
+*.bin
+*.pth
+
+PosTagging/outputs/models/
+PosTagging/outputs/processed/
+*.pt
 # Entornos virtuales
 venv/
 .env/
