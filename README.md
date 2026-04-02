@@ -1,234 +1,134 @@
-# POS Tagging en Español
+# POS Tagging en Espanol
 
-Proyecto del curso de **Procesamiento de Lenguaje Natural** para
-implementar un sistema de **POS Tagging** utilizando modelos basados en
-**BiLSTM** sobre datasets en español.
+Proyecto del curso de **Procesamiento de Lenguaje Natural** (Univalle).
+Implementa un sistema de **POS Tagging** utilizando modelos basados en
+**BiLSTM** sobre datasets en espanol.
 
-El proyecto está dividido en varias fases que se desarrollarán
-progresivamente por los integrantes del equipo.
+---
 
-------------------------------------------------------------------------
+## Objetivo
 
-# Objetivo del proyecto
+Construir y evaluar modelos de etiquetado gramatical (Part-of-Speech Tagging)
+para espanol utilizando los datasets **Ancora** y **CoNLL2002**.
 
-Construir y evaluar modelos de etiquetado gramatical (**Part-of-Speech
-Tagging**) para español utilizando:
+---
 
--   Dataset **Ancora**
--   Dataset **CoNLL2002**
+## Modelos implementados
 
-El pipeline completo del proyecto incluirá:
+| Modelo | Descripcion |
+|--------|-------------|
+| **BiLSTM Base** | Embedding + BiLSTM + FC |
+| **BiLSTM Deep** | Embedding + BiLSTM + Dense + ReLU + Dropout + FC |
+| **BiLSTM-CRF** | Embedding + BiLSTM + FC + CRF (decodificacion Viterbi) |
 
-1.  Preprocesamiento de datos\
-2.  Construcción de vocabularios\
-3.  Modelos de Deep Learning (BiLSTM)\
-4.  Entrenamiento\
-5.  Evaluación
+Cada modelo se entrena con **grid search de 24 combinaciones** de hiperparametros
+(batch_size, optimizer, embedding_dim, hidden_dim) con early stopping.
 
-------------------------------------------------------------------------
+---
 
-# Estado actual del repositorio
+## Datasets
 
-Actualmente se ha completado la **FASE I: Preprocesamiento de los
-datasets**.
+| Metrica | Ancora | CoNLL2002 |
+|---------|--------|-----------|
+| Train sentences | 12,141 | 8,323 |
+| Val sentences | 2,602 | 1,915 |
+| Test sentences | 2,602 | 1,517 |
+| Vocabulario palabras | 36,131 | 26,101 |
+| Etiquetas POS | 17 (universales) | 61 (EAGLES) |
+| Max sequence length | 148 | 1,238 |
 
-Las siguientes fases del proyecto serán implementadas posteriormente por
-otros integrantes del equipo.
+**Nota:** Los esquemas de etiquetas son incompatibles entre si.
+Ancora usa etiquetas universales (`NOUN`, `VERB`, `DET`) mientras que
+CoNLL2002 usa etiquetas EAGLES (`NC`, `VMI`, `DA`).
 
-------------------------------------------------------------------------
+---
 
-# Fase I --- Preprocesamiento de datos
+## Estructura del proyecto
 
-El código de esta fase se encuentra en:
-
-    src/preprocessing/
-
-Esta fase incluye:
-
--   carga de datasets\
--   limpieza de datos\
--   construcción de secuencias de oraciones\
--   creación de vocabularios\
--   indexación de palabras y etiquetas\
--   partición de datos\
--   padding de secuencias\
--   creación de máscaras\
--   construcción de `Dataset` y `DataLoader` para PyTorch
-
-El objetivo de esta fase es dejar los datos **listos para ser utilizados
-por los modelos de entrenamiento en las siguientes etapas del
-proyecto**.
-
-------------------------------------------------------------------------
-
-# Datasets utilizados
-
-## Ancora
-
-Formato original del dataset:
-
-    Sentence #
-    Word
-    POS
-
-Pipeline aplicado:
-
--   limpieza de columnas
--   construcción de oraciones usando `Sentence #`
--   split train / validation / test = **70 / 15 / 15**
--   vocabulario de palabras construido solo con train
--   indexación de palabras y etiquetas
--   padding de secuencias
--   generación de máscaras
--   construcción de `Dataset` y `DataLoader`
-
-Resumen del dataset procesado:
-
-    Oraciones totales: 17345
-    Vocabulario de palabras (train): 36131
-    Etiquetas POS: 17
-    Max sequence length: 148
-
-------------------------------------------------------------------------
-
-## CoNLL2002
-
-Formato original del dataset:
-
-    Word POS NER
-
-Las oraciones están separadas por **líneas vacías**.
-
-Pipeline aplicado:
-
--   lectura de `train.txt`, `valid.txt`, `test.txt`
--   construcción de oraciones por separación de líneas vacías
--   vocabulario de palabras construido solo con train
--   vocabulario POS construido solo con train
--   soporte para etiquetas desconocidas (`<UNK_TAG>`)
--   indexación
--   padding
--   generación de máscaras
--   construcción de `Dataset` y `DataLoader`
-
-Resumen del dataset procesado:
-
-    Train sentences: 8323
-    Validation sentences: 1915
-    Test sentences: 1517
-
-    Vocabulario de palabras: 26101
-    Vocabulario de etiquetas POS: 61
-
-    Max sequence length: 1238
-
-Nota:
-
-CoNLL2002 contiene secuencias muy largas, por lo que en fases
-posteriores puede ser necesario aplicar **truncamiento o limitar la
-longitud máxima** para mejorar eficiencia durante el entrenamiento.
-
-------------------------------------------------------------------------
-
-# Estructura del proyecto
-
-    data/
-     ├── raw/
-     │   ├── ancora/
-     │   │   └── ancora_corpus_pos.csv
-     │   └── conll2002/
-     │       ├── train.txt
-     │       ├── valid.txt
-     │       └── test.txt
-
-    src/
-     ├── preprocessing/
-     ├── models/
-     └── training/
-
-    outputs/
-     ├── artifacts/
-     └── reports/
-
-------------------------------------------------------------------------
-
-# Scripts principales
-
-Para ejecutar el preprocesamiento completo:
-
-    src/preprocessing/run_phase1_all.py
-
-También es posible ejecutar cada dataset por separado:
-
-    src/preprocessing/run_phase1_ancora.py
-    src/preprocessing/run_phase1_conll.py
-
-------------------------------------------------------------------------
-
-# Cómo ejecutar la Fase I
-
-Desde la raíz del proyecto:
-
-``` bash
-python src/preprocessing/run_phase1_all.py
+```
+Taller1PLN/
+|-- main.py                 <- Menu principal
+|-- config.py               <- Paths centralizados
+|-- requirements.txt        <- Dependencias
+|
+|-- data/raw/               <- Datasets crudos
+|   |-- ancora/             <- ancora_corpus_pos.csv
+|   |-- conll2002/          <- train.txt, valid.txt, test.txt
+|
+|-- src/
+|   |-- preprocessing/      <- Carga, limpieza, vocabularios, DataLoaders
+|   |   |-- utils.py        <- Funciones compartidas (vocab, encode, pad, split)
+|   |   |-- ancora.py       <- Pipeline completo Ancora
+|   |   |-- conll.py        <- Pipeline completo CoNLL2002
+|   |   |-- export.py       <- Exportar datos procesados a .pt
+|   |
+|   |-- training/           <- Entrenamiento de modelos
+|   |   |-- bilstm_base/    <- model, train, predict, grid_search
+|   |   |-- bilstm_deep/    <- model, train, predict, grid_search
+|   |   |-- bilstm_crf/     <- model, train, predict, grid_search
+|   |
+|   |-- inference/          <- Uso de modelos para etiquetar texto
+|       |-- tagger.py       <- Cargar modelos y etiquetar oraciones
+|
+|-- outputs/
+    |-- artifacts/          <- Vocabularios JSON
+    |-- models/             <- Modelos entrenados (.pt)
+    |-- processed/          <- Datos serializados (.pt)
+    |-- reports/            <- Reportes de evaluacion
 ```
 
-Esto generará los artefactos de preprocesamiento y los reportes
-correspondientes.
+---
 
-------------------------------------------------------------------------
+## Como ejecutar
 
-# Artefactos generados
+```bash
+# Crear entorno virtual e instalar dependencias
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
 
-Los artefactos generados por la Fase I se guardan en:
+# Ejecutar el menu principal
+python main.py
+```
 
-    outputs/artifacts/
+### Opciones del menu
 
-Incluyen:
+| Opcion | Descripcion |
+|--------|-------------|
+| **1a-1c** | Preprocesar Ancora, CoNLL o ambos |
+| **1d** | Exportar datos procesados (.pt) |
+| **2a** | Entrenar BiLSTM Base (Ancora + CoNLL) |
+| **2b** | Entrenar BiLSTM Deep (Ancora + CoNLL) |
+| **2c** | Entrenar BiLSTM-CRF (Ancora + CoNLL) |
+| **3a** | Etiquetar oraciones (modo interactivo) |
+| **3b** | Ver modelos disponibles |
 
--   vocabulario de palabras
--   vocabulario de etiquetas POS
+### Orden de ejecucion para un pipeline completo
 
-Reportes generados:
+1. `1c` - Preprocesar ambos datasets
+2. `1d` - Exportar datos procesados
+3. `2a`, `2b`, `2c` - Entrenar modelos
+4. `3a` - Etiquetar oraciones
 
-    outputs/reports/
+---
 
--   `phase1_ancora_summary.txt`
--   `phase1_conll_summary.txt`
--   `phase1_handoff.md`
+## Reportes generados
 
-------------------------------------------------------------------------
+Al entrenar cada modelo se generan automaticamente:
 
-# Nota importante sobre los datasets
+- **Reporte individual** por modelo y dataset (`outputs/reports/bilstm_ancora_report.txt`)
+  con metricas globales, metricas por etiqueta y detalle del grid search.
+- **Tabla comparativa global** (`outputs/reports/tabla_comparativa_global.txt`)
+  con todos los modelos entrenados.
 
-Ancora y CoNLL2002 **no utilizan el mismo esquema de etiquetas POS**.
+Formato de la tabla:
 
-Ancora usa etiquetas universales como:
-
-    NOUN, VERB, DET, ADJ, ADV
-
-Mientras que CoNLL2002 utiliza etiquetas tipo **EAGLES**, por ejemplo:
-
-    NC, NP, DA, AQ, VMI, RG
-
-Por lo tanto, **no deben mezclarse directamente sin definir previamente
-un mapeo de etiquetas**.
-
-------------------------------------------------------------------------
-
-# Próximas fases del proyecto
-
-Las siguientes etapas del proyecto incluirán:
-
--   implementación de modelos **BiLSTM**
--   entrenamiento del modelo
--   evaluación
--   comparación entre datasets
-
-Estas fases serán desarrolladas por otros integrantes del equipo.
-
-------------------------------------------------------------------------
-
-# Integrantes del equipo
-
-**Anderson Johan Alban Angulo** --- Preprocesamiento
+```
+Modelo       | Dataset   | Accuracy | Precision | Recall | F1-Score
+BiLSTM       | Ancora    | 0.XXXX   | 0.XXXX    | 0.XXXX | 0.XXXX
+BiLSTM+Dense | Ancora    | 0.XXXX   | 0.XXXX    | 0.XXXX | 0.XXXX
+BiLSTM-CRF   | Ancora    | 0.XXXX   | 0.XXXX    | 0.XXXX | 0.XXXX
+BiLSTM       | CoNLL2002 | 0.XXXX   | 0.XXXX    | 0.XXXX | 0.XXXX
+BiLSTM+Dense | CoNLL2002 | 0.XXXX   | 0.XXXX    | 0.XXXX | 0.XXXX
+BiLSTM-CRF   | CoNLL2002 | 0.XXXX   | 0.XXXX    | 0.XXXX | 0.XXXX
+```
