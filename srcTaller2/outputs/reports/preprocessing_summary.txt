@@ -1,0 +1,18 @@
+TALLER 2 - RESUMEN PREPROCESAMIENTO
+==================================================
+
+CoNLL2002
+Train: 8323
+Validation: 1915
+Test: 1517
+
+Ancora
+Train: 12141
+Validation: 2602
+Test: 2602
+
+Archivos generados:
+- conll2002_splits.json
+- ancora_splits.json
+- conll2002_first_3.json
+- ancora_first_3.json

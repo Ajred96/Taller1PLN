@@ -1,0 +1,176 @@
+[
+  {
+    "filename": "Informe Final Taller 1.docx.pdf",
+    "chunk_id": 0,
+    "text": " \nINFORME FINAL TALLER 1 \n \n \n \n \nPresentado por: \nCristian Camilo Llanos Alvarez - 1943852 \nAnderson Johan Alban Angulo - 2310006 \nGustavo Adolfo Arango Nieves - 2310133 \nJuan Esteban Clavijo García - 2225709 \nJhoan Felipe Leon Correa - 2228527 \n \n \n \n \nPresentado a: \nRAUL ERNESTO GUTIERREZ DE PIÑEREZ REYES \n \n \n \n \nMateria: \nINT. A PROCESAMIENTO DE LENGUAJE NATURAL - 750108M \n \n \n \n \n \n \n \n \n \n \n \n \nUNIVERSIDAD DEL VALLE \nFACULTAD DE INGENIERÍA \nSantiago de Cali \nMarzo de 2026\n \n\nIntroducción \n \nEl presente informe tiene como objetivo evaluar el desempeño de tres \narquitecturas de aprendizaje profundo: BiLSTM, BiLSTM-Deep y BiLSTM-CRF. \n \nLa tarea de POS tagging consiste en asignar etiquetas gramaticales a cada \npalabra dentro de una oración, lo cual representa un problema de etiquetado \nsecuencial, donde el contexto y la dependencia entre palabras juegan un rol \nfundamental. \n \nSe utilizaron los datasets Ancora y CoNLL2002, evaluando los modelos mediante \nmétricas estándar: Accuracy",
+    "chunk_size": 1000
+  },
+  {
+    "filename": "Informe Final Taller 1.docx.pdf",
+    "chunk_id": 1,
+    "text": "\nsecuencial, donde el contexto y la dependencia entre palabras juegan un rol \nfundamental. \n \nSe utilizaron los datasets Ancora y CoNLL2002, evaluando los modelos mediante \nmétricas estándar: Accuracy, Precision, Recall y F1-score. \n \n1.​ Modelos Evaluados \n \nEn este trabajo se evaluaron tres modelos de redes neuronales diseñados para \nentender el contexto de las palabras dentro de una oración y asignarles su \netiqueta gramatical correspondiente. \n \n●​ BiLSTM (modelo base): Este modelo analiza cada oración de izquierda a \nderecha y de derecha a izquierda, esto le permite entender mejor el \ncontexto de cada palabra, por ejemplo: \no​ La palabra “bajo” puede significar cosas distintas dependiendo de lo \nque viene antes y después. En términos simples, es como leer una \noración completa antes de decidir qué significa cada palabra. \n●​ Arquitectura:  \nEmbedding → BiLSTM → Linear → Softmax \n \n●​ BiLSTM-Deep: Este modelo es una versión mejorada del anterior. Después \nde entender el contexto co",
+    "chunk_size": 1000
+  },
+  {
+    "filename": "Informe Final Taller 1.docx.pdf",
+    "chunk_id": 2,
+    "text": "e decidir qué significa cada palabra. \n●​ Arquitectura:  \nEmbedding → BiLSTM → Linear → Softmax \n \n●​ BiLSTM-Deep: Este modelo es una versión mejorada del anterior. Después \nde entender el contexto con la BiLSTM, se agregan capas adicionales \n(densas) que permiten al modelo:  \no​ Detectar patrones más complejos \no​ Refinar mejor las decisiones  \nNo solo entiende la oración, sino que también “piensa un poco más” antes \nde decidir la etiqueta, es como alguien que no responde de inmediato, sino \nque analiza más profundamente. \n●​ Arquitectura:  \nEmbedding → BiLSTM → Linear → ReLU → Linear → Softmax \nEmbedding → BiLSTM → Linear → ReLU → Dropout → Linear → Softmax \n \n●​ BiLSTM-CRF: Este modelo añade una capa extra llamada CRF, que tiene \nun objetivo distinto el cual es no solo clasificar palabras individualmente, \nsino que también: \no​ Considera la relación entre etiquetas consecutivas  \no​ Intenta que toda la secuencia tenga sentido gramatical  \n \n \n\nPor lo que no decide palabra por palabr",
+    "chunk_size": 1000
+  },
+  {
+    "filename": "Informe Final Taller 1.docx.pdf",
+    "chunk_id": 3,
+    "text": "as individualmente, \nsino que también: \no​ Considera la relación entre etiquetas consecutivas  \no​ Intenta que toda la secuencia tenga sentido gramatical  \n \n \n\nPor lo que no decide palabra por palabra, sino que arma toda la frase de \nmanera coherente, por ejemplo: \no​ Es más probable que un determinante sea seguido por un sustantivo \no​ El modelo aprende este tipo de reglas automáticamente \n \n2.​ Resultados Generales \n \n2.1​Dataset Ancora \n \nModelo \nAccuracy Precision Recall F1-score \nBiLSTM \n0.9591 \n0.95 \n0.88 \n0.903 \nBiLSTM-Deep 0.9563 \n0.96 \n0.96 \n0.9563 \nBiLSTM-CRF 0.9619 \n0.97 \n0.88 \n0.91 \n \n3.2 Dataset CoNLL2002 \n \nModelo \nAccuracy Precision Recall F1-score \nBiLSTM \n0.9450 \n0.93 \n0.90 \n0.911 \nBiLSTM-Deep 0.9416 \n0.94 \n0.94 \n0.9389 \nBiLSTM-CRF 0.9497 \n0.9376 \n0.8832 0.8990 \n \n4. Análisis de Resultados \n \n4.1 Análisis en dataset Ancora \n \nMejor modelo en F1-score: BiLSTM-Deep (0.9563) \n \nAunque el BiLSTM-CRF tiene mayor Accuracy (0.9619), el mejor equilibrio entre \nprecisión y rec",
+    "chunk_size": 1000
+  },
+  {
+    "filename": "Informe Final Taller 1.docx.pdf",
+    "chunk_id": 4,
+    "text": "isis de Resultados \n \n4.1 Análisis en dataset Ancora \n \nMejor modelo en F1-score: BiLSTM-Deep (0.9563) \n \nAunque el BiLSTM-CRF tiene mayor Accuracy (0.9619), el mejor equilibrio entre \nprecisión y recall lo logra BiLSTM-Deep. \n \n●​ BiLSTM-Deep logra el mejor Recall (0.96) lo que quiere decir que detecta \nmás correctamente las etiquetas reales, su F1-score es significativamente \nsuperior (+5% vs BiLSTM). Lo que indica que las capas profundas \nayudan a capturar patrones más complejos del lenguaje.  \nEsto ocurre porque las capas densas adicionales permiten transformar la \ninformación contextual generada por la BiLSTM en representaciones más \ncomplejas. De esta forma, el modelo no solo entiende el contexto, sino que \ntambién lo procesa en mayor profundidad antes de tomar una decisión, lo \nque mejora su capacidad de generalización frente a ejemplos no vistos. \n \n●​ El comportamiento del BiLSTM-CRF nos dice que aunque tiene mejor \nAccuracy y Precision (0.97), tiene un Recall bajo de (0.88), ",
+    "chunk_size": 1000
+  },
+  {
+    "filename": "Informe Final Taller 1.docx.pdf",
+    "chunk_id": 5,
+    "text": "mejora su capacidad de generalización frente a ejemplos no vistos. \n \n●​ El comportamiento del BiLSTM-CRF nos dice que aunque tiene mejor \nAccuracy y Precision (0.97), tiene un Recall bajo de (0.88), lo que nos \nsugiere que el modelo es muy preciso cuando predice pero pierde \netiquetas reales. Por lo tanto, CRF está siendo más conservador, \npriorizando secuencias altamente probables, pero sacrificando cobertura. \n \n\n4.2 Análisis en dataset CoNLL2002 \n \nMejor modelo en F1-score: BiLSTM-Deep (0.9389) \n \nNuevamente, el modelo por profundidad domina, en la siguiente tabla hacemos un \nresumen que nos ayuda a entender de forma rápida y general el comportamiento \nde los modelos: \n \nModelo \nObservación \nBiLSTM \nBalanceado pero menor rendimiento \nBiLSTM-Deep \nMejor equilibrio global \nBiLSTM-CRF \nMayor Accuracy pero peor F1 \n \nPodemos notar un caso crítico con el modelo BiLSTM-CRF ya que su accuracy \nes el más alto con 0.9497 pero es el que peor F1-score presenta con 0.8990, Lo \nque nos hace con",
+    "chunk_size": 1000
+  },
+  {
+    "filename": "Informe Final Taller 1.docx.pdf",
+    "chunk_id": 6,
+    "text": "yor Accuracy pero peor F1 \n \nPodemos notar un caso crítico con el modelo BiLSTM-CRF ya que su accuracy \nes el más alto con 0.9497 pero es el que peor F1-score presenta con 0.8990, Lo \nque nos hace concluir que hay un desbalance entre precision y recall. \n \nAunque el modelo BiLSTM-CRF obtiene la mayor accuracy, esta métrica no \nsiempre refleja el desempeño real del modelo en tareas de clasificación multiclase. \nLa accuracy puede verse influenciada por clases dominantes, mientras que el \nF1-score considera tanto la precisión como el recall. Por esta razón, el F1-score es \nuna métrica más adecuada en este contexto, ya que permite evaluar el equilibrio \nentre detectar correctamente las etiquetas y evitar errores. \n \n4.3 Comparación Global \n \nModelo \nComportamiento \nBiLSTM \nBase sólida \nBiLSTM-Deep \nMejor modelo global \nBiLSTM-CRF \nAlta precisión, baja cobertura \n \n4.4 Análisis por Etiqueta (Class-wise) \n \nAnexo Tabla de resultado \n \nAdemás del análisis global, es importante examinar el des",
+    "chunk_size": 1000
+  },
+  {
+    "filename": "Informe Final Taller 1.docx.pdf",
+    "chunk_id": 7,
+    "text": "Deep \nMejor modelo global \nBiLSTM-CRF \nAlta precisión, baja cobertura \n \n4.4 Análisis por Etiqueta (Class-wise) \n \nAnexo Tabla de resultado \n \nAdemás del análisis global, es importante examinar el desempeño de los modelos \na nivel de etiqueta, ya que esto permite identificar en qué tipos de palabras cada \nmodelo presenta fortalezas o debilidades. \n \nCon Ancora: \n \nEn el dataset Ancora se observa que: \n \n●​ Las etiquetas más frecuentes como NOUN, VERB, ADP, PRON y AUX \npresentan valores altos de F1-score en todos los modelos (cercanos a 0.90 \n- 1.00). Esto ocurre porque estas clases aparecen con mayor frecuencia en \n\nel dataset, lo que permite al modelo ver más ejemplos durante el \nentrenamiento y aprender mejor sus patrones contextuales. \n \nSin embargo, aparecen diferencias importantes en etiquetas menos frecuentes: \n \n●​ SYM e INTJ presentan F1-scores bajos, por ejemplo:  \no​ SYM (BiLSTM): F1 ≈ 0.51  \no​ INTJ (BiLSTM-Deep): F1 ≈ 0.40  \n \nEsto se debe a que estas etiquetas: \n \n●​ Apare",
+    "chunk_size": 1000
+  },
+  {
+    "filename": "Informe Final Taller 1.docx.pdf",
+    "chunk_id": 8,
+    "text": "etiquetas menos frecuentes: \n \n●​ SYM e INTJ presentan F1-scores bajos, por ejemplo:  \no​ SYM (BiLSTM): F1 ≈ 0.51  \no​ INTJ (BiLSTM-Deep): F1 ≈ 0.40  \n \nEsto se debe a que estas etiquetas: \n \n●​ Aparecen muy pocas veces en el dataset  \n●​ Tienen menor cantidad de ejemplos para aprender  \n●​ Pueden presentar mayor variabilidad en su uso  \n \nComo consecuencia, el modelo no logra generalizar correctamente para estas \nclases. \n \nEn este sentido, se evidencia un problema de desbalance de clases, donde las \netiquetas menos frecuentes son más difíciles de aprender, ya que el modelo tiende \na optimizar su desempeño hacia las clases dominantes. \n \nCon CoNLL2002: \n \nEn CoNLL2002 se observa un comportamiento aún más marcado debido a la gran \ncantidad de etiquetas y su variabilidad. \n \nEtiquetas con desempeño alto \n \n●​ Puntuación (Fc, Fp, Fpt, etc.) → F1 ≈ 1.00  \n \nEsto se debe a que los signos de puntuación presentan formas fijas y \nfunciones muy definidas dentro de la oración, lo que reduce la ",
+    "chunk_size": 1000
+  },
+  {
+    "filename": "Informe Final Taller 1.docx.pdf",
+    "chunk_id": 9,
+    "text": "esempeño alto \n \n●​ Puntuación (Fc, Fp, Fpt, etc.) → F1 ≈ 1.00  \n \nEsto se debe a que los signos de puntuación presentan formas fijas y \nfunciones muy definidas dentro de la oración, lo que reduce la ambigüedad. \nA diferencia de otras categorías gramaticales, su identificación depende \nprincipalmente de su forma superficial, facilitando su aprendizaje por parte \ndel modelo. \n \n●​ Determinantes y conectores → desempeño casi perfecto  \n \nEsto ocurre porque: \n \n●​ Son altamente frecuentes en el dataset  \n●​ Tienen patrones muy consistentes (poca ambigüedad)  \n●​ Su contexto es fácil de identificar \n \n\nEtiquetas problemáticas \n \nSe identifican etiquetas con bajo desempeño en todos los modelos: \n \n●​ VMM (verbo modal)  \n●​ VMG (gerundio)  \n●​ Y (símbolos especiales)  \n \nEsto se debe a: \n \n●​ Alta ambigüedad lingüística (pueden aparecer en múltiples contextos)  \n●​ Baja frecuencia en el dataset  \n●​ Mayor complejidad morfológica (especialmente en verbos)  \n \nPor ejemplo, los verbos pueden ca",
+    "chunk_size": 1000
+  },
+  {
+    "filename": "Informe Final Taller 1.docx.pdf",
+    "chunk_id": 10,
+    "text": "ta ambigüedad lingüística (pueden aparecer en múltiples contextos)  \n●​ Baja frecuencia en el dataset  \n●​ Mayor complejidad morfológica (especialmente en verbos)  \n \nPor ejemplo, los verbos pueden cambiar según tiempo, modo y persona, lo que \ndificulta su correcta clasificación. \nEsta variabilidad genera un mayor número de combinaciones posibles, lo que \ndificulta que el modelo aprenda patrones consistentes, especialmente cuando \nalgunas formas aparecen con poca frecuencia en el dataset. \n \nComparación entre modelos por etiqueta \n \nBiLSTM-Deep \n \n●​ Mejora el F1-score en muchas etiquetas  \n●​ Maneja mejor clases intermedias (ej: AQ, NC, VERB)  \n \nIndica mejor capacidad de generalización \n \nBiLSTM-CRF \n \nPresenta un patrón muy interesante: \n \n●​ Alta precisión en muchas etiquetas  \n●​ Pero bajo recall en etiquetas complejas  \n \nEjemplos claros: \n \n●​ DT en CoNLL2002:  \no​ Precision = 1.00  \no​ Recall = 0.20  \no​ F1 = 0.33  \n \nEl CRF predice sólo cuando está muy seguro, pero deja muchos",
+    "chunk_size": 1000
+  },
+  {
+    "filename": "Informe Final Taller 1.docx.pdf",
+    "chunk_id": 11,
+    "text": " bajo recall en etiquetas complejas  \n \nEjemplos claros: \n \n●​ DT en CoNLL2002:  \no​ Precision = 1.00  \no​ Recall = 0.20  \no​ F1 = 0.33  \n \nEl CRF predice sólo cuando está muy seguro, pero deja muchos casos sin \ndetectar. \n \n\nConclusión del análisis por etiquetas \n \nEl análisis por etiqueta confirma lo observado en las métricas globales: \n \n●​ Los modelos funcionan muy bien en etiquetas frecuentes y estructuralmente \nsimples  \n●​ Fallan en etiquetas raras, ambiguas o con poca representación  \n \nAdemás, el modelo BiLSTM-Deep logra el mejor equilibrio entre precisión y recall \nen la mayoría de las etiquetas, mientras que el modelo BiLSTM-CRF tiende a ser \nmás conservador, afectando negativamente el recall en clases complejas. \n \n5. Entonces, ¿el CRF ayudó realmente? \n \nTeóricamente, la incorporación de una capa CRF debería mejorar el desempeño \nen tareas de etiquetado secuencial, ya que: \n \n●​ Modela dependencias entre etiquetas  \n●​ Asegura coherencia secuencial en las predicciones  \n \n",
+    "chunk_size": 1000
+  },
+  {
+    "filename": "Informe Final Taller 1.docx.pdf",
+    "chunk_id": 12,
+    "text": "poración de una capa CRF debería mejorar el desempeño \nen tareas de etiquetado secuencial, ya que: \n \n●​ Modela dependencias entre etiquetas  \n●​ Asegura coherencia secuencial en las predicciones  \n \nSin embargo, en la práctica, los resultados obtenidos muestran que el modelo \nBiLSTM-CRF no supera al modelo BiLSTM-Deep, presentando un Recall \nconsistentemente bajo, lo que impacta negativamente el F1-score. \n \nUna posible explicación de este comportamiento es el fenómeno de sobreajuste a \nsecuencias frecuentes. \n \nEl CRF aprende no sólo las etiquetas, sino también las transiciones más \nprobables entre ellas, lo que implica que el modelo tiende a favorecer las \nestructuras más comunes observadas durante el entrenamiento; por ejemplo, \ndeterminante seguido de sustantivo. \n \nSi bien esto mejora la coherencia de las predicciones, también provoca que el \nmodelo: \n \n●​ Sea más conservador en sus predicciones  \n \nEste comportamiento se explica porque el CRF optimiza la probabilidad de \nsecuenc",
+    "chunk_size": 1000
+  },
+  {
+    "filename": "Informe Final Taller 1.docx.pdf",
+    "chunk_id": 13,
+    "text": "a la coherencia de las predicciones, también provoca que el \nmodelo: \n \n●​ Sea más conservador en sus predicciones  \n \nEste comportamiento se explica porque el CRF optimiza la probabilidad de \nsecuencias completas de etiquetas, favoreciendo aquellas combinaciones \nque ha observado con mayor frecuencia durante el entrenamiento. Como \nresultado, evita asignar etiquetas en contextos inciertos, lo que reduce \nerrores en algunos casos, pero también disminuye la capacidad de detectar \nejemplos válidos menos comunes. \n \n●​ Evite asignar etiquetas menos frecuentes o ambiguas  \n●​ Pierda capacidad de generalización  \n \n\nComo consecuencia, el modelo puede fallar al reconocer correctamente etiquetas \nválidas en contextos menos comunes, reduciendo el Recall. \n \nEn este sentido, el CRF actúa como un mecanismo que prioriza la consistencia \nestructural sobre la cobertura de casos, lo que explica por qué, a pesar de obtener \nbuenos valores de accuracy o precision, su desempeño global medido mediante \n",
+    "chunk_size": 1000
+  },
+  {
+    "filename": "Informe Final Taller 1.docx.pdf",
+    "chunk_id": 14,
+    "text": "canismo que prioriza la consistencia \nestructural sobre la cobertura de casos, lo que explica por qué, a pesar de obtener \nbuenos valores de accuracy o precision, su desempeño global medido mediante \nF1-score resulta inferior al del modelo BiLSTM-Deep. \n \n6. Conclusiones \n \nA partir de los resultados obtenidos en los datasets Ancora y CoNLL2002, se \nconcluye que el modelo BiLSTM-Deep fue el que presentó el mejor desempeño \nglobal, al alcanzar los mayores valores de F1-score en ambos conjuntos de datos. \n  \nEsto indica que la incorporación de capas densas adicionales permitió al modelo \naprender representaciones más ricas y discriminativas, mejorando su capacidad \nde generalización frente a diferentes contextos lingüísticos. \n \nAunque el modelo BiLSTM-CRF obtuvo los mayores valores de accuracy, su \ndesempeño global no fue el mejor, debido a que presentó valores de recall más \nbajos y, en consecuencia, F1-scores inferiores al modelo profundo. Esto sugiere \nque, si bien la capa CRF aporta",
+    "chunk_size": 1000
+  },
+  {
+    "filename": "Informe Final Taller 1.docx.pdf",
+    "chunk_id": 15,
+    "text": "acy, su \ndesempeño global no fue el mejor, debido a que presentó valores de recall más \nbajos y, en consecuencia, F1-scores inferiores al modelo profundo. Esto sugiere \nque, si bien la capa CRF aporta coherencia secuencial al modelar dependencias \nentre etiquetas, también puede volver al modelo más conservador, favoreciendo \nsecuencias frecuentes y reduciendo su capacidad para reconocer casos menos \ncomunes o más ambiguos. \n \nEl análisis por etiqueta confirmó que los tres modelos funcionan muy bien en \nclases frecuentes y poco ambiguas, como puntuación, determinantes y algunas \ncategorías funcionales, ya que estas presentan patrones más consistentes y \nfáciles de aprender. En contraste, las etiquetas menos frecuentes, ambiguas o \nmorfológicamente complejas, como algunas categorías verbales, símbolos e \ninterjecciones, mostraron un desempeño más bajo, evidenciando el efecto del \ndesbalance de clases y de la variabilidad lingüística sobre el aprendizaje. \n \nEn conjunto, los resultados mu",
+    "chunk_size": 1000
+  },
+  {
+    "filename": "Informe Final Taller 1.docx.pdf",
+    "chunk_id": 16,
+    "text": ", símbolos e \ninterjecciones, mostraron un desempeño más bajo, evidenciando el efecto del \ndesbalance de clases y de la variabilidad lingüística sobre el aprendizaje. \n \nEn conjunto, los resultados muestran que en esta tarea no basta con modelar \ndependencias secuenciales, sino que también es fundamental contar con una \nrepresentación interna suficientemente rica para capturar la complejidad del \nlenguaje. En este experimento, la estrategia más efectiva fue aumentar la \ncapacidad representacional del modelo mediante profundidad adicional, lo que \npermitió un mejor equilibrio entre precisión y recall. \n \nFinalmente, puede concluirse que el modelo BiLSTM-Deep fue la mejor alternativa \npara este taller, ya que ofreció el rendimiento más sólido y balanceado en ambos \ndatasets. Esto demuestra que, para la tarea de POS tagging en español evaluada \nen este trabajo, la profundidad del modelo resultó más beneficiosa que la \nimposición de restricciones estructurales mediante CRF. \n",
+    "chunk_size": 986
+  },
+  {
+    "filename": "Informe Final Taller 1.docx.pdf",
+    "chunk_id": 17,
+    "text": "ue, para la tarea de POS tagging en español evaluada \nen este trabajo, la profundidad del modelo resultó más beneficiosa que la \nimposición de restricciones estructurales mediante CRF. \n",
+    "chunk_size": 186
+  },
+  {
+    "filename": "Taller #1. Datasets, tokenización y embeddings-sistemas.pdf",
+    "chunk_id": 0,
+    "text": "Taller #1. Datasets, tokenización y embeddings \n1. El objetivo de este ejercicio es analizar el comportamiento de dos estrategias de \ntokenización utilizadas en modelos de lenguaje modernos para tareas de Procesamiento del \nLenguaje Natural (PLN): WordPiece y SentencePiece. Para ello, se utilizarán los datasets \nConll2002 y Ancora, aplicando ambos tokenizadores sobre diferentes subconjuntos de \nentrenamiento, validación y prueba. \nEn el caso del dataset Conll2002, se utilizarán directamente los conjuntos originales de \nentrenamiento (train), validación (validation) y prueba (test). Posteriormente, se tokenizarán \núnicamente las tres primeras sentencias de cada conjunto usando: \n●​ El tokenizador WordPiece del modelo BETO.. \n●​ Un tokenizador basado en SentencePiece, buscando una segmentación más \ncercana a palabras completas. \nPara el dataset Ancora, primero será necesario construir manualmente los conjuntos de \nentrenamiento, validación y prueba. Se deberá dividir el corpus de la sigu",
+    "chunk_size": 1000
+  },
+  {
+    "filename": "Taller #1. Datasets, tokenización y embeddings-sistemas.pdf",
+    "chunk_id": 1,
+    "text": "ón más \ncercana a palabras completas. \nPara el dataset Ancora, primero será necesario construir manualmente los conjuntos de \nentrenamiento, validación y prueba. Se deberá dividir el corpus de la siguiente manera: \n●​ 70% para entrenamiento (train), \n●​ 15% para validación (validation), \n●​ 15% para prueba (test). \nUna vez realizada la partición, se seleccionarán las tres primeras sentencias de cada \nconjunto y se aplicarán nuevamente los dos tokenizadores: WordPiece y SentencePiece. \nEl propósito del ejercicio es comparar cómo ambos métodos fragmentan las palabras del \nespañol, observando especialmente: \n●​ la cantidad de subpalabras generadas, \n●​ la preservación de palabras completas, \n●​ el tratamiento de palabras desconocidas, \n●​ y las diferencias entre una tokenización orientada a subpalabras (WordPiece) y otra \nmás cercana a unidades léxicas completas (SentencePiece). \nActividades propuestas \n1.​ Cargar los datasets Conll2002 y Ancora. \n2.​ Peprocesar los conjuntos de train, va",
+    "chunk_size": 1000
+  },
+  {
+    "filename": "Taller #1. Datasets, tokenización y embeddings-sistemas.pdf",
+    "chunk_id": 2,
+    "text": "ubpalabras (WordPiece) y otra \nmás cercana a unidades léxicas completas (SentencePiece). \nActividades propuestas \n1.​ Cargar los datasets Conll2002 y Ancora. \n2.​ Peprocesar los conjuntos de train, validación y testeo de  Ancora. \n3.​ Mostrar ejemplos originales de las sentencias antes de tokenizar. \n4.​ Aplicar el tokenizador WordPiece del modelo BETO a las sentencias de tokens de \nConll2002 y Ancora. \n5.​ Aplicar el tokenizador SentencePiece a las sentencias de tokens de Conll2002 y \nAncora. \n6.​ Comparar los resultados obtenidos. \n7.​ Analizar cuál tokenizador conserva mejor la estructura léxica del español. \n\n \n \nEjemplo esperado de comparación \nSentencia original: \n“El presidente visitó Barcelona durante la conferencia.” \nTokenización con Wordpiece (BETO) \n['El', 'presidente', 'visitó', 'Bar', '##ce', '##lo', '##na', 'durante', 'la', 'conferencia', '.'] \nTokenizción SentencPiece \n['▁El', '▁presidente', '▁visitó', '▁Barcelona', '▁durante', '▁la', '▁conferencia', '.'] \nNota importan",
+    "chunk_size": 1000
+  },
+  {
+    "filename": "Taller #1. Datasets, tokenización y embeddings-sistemas.pdf",
+    "chunk_id": 3,
+    "text": "', 'Bar', '##ce', '##lo', '##na', 'durante', 'la', 'conferencia', '.'] \nTokenizción SentencPiece \n['▁El', '▁presidente', '▁visitó', '▁Barcelona', '▁durante', '▁la', '▁conferencia', '.'] \nNota importante.  Se debe elaborar una conclusión donde se explique cuál de los dos \nenfoques produce una segmentación más adecuada para el español y cómo esto puede \nimpactar el rendimiento de modelos de PLN basados en Transformers. \n \n2. El objetivo de este ejercicio es estudiar la representación semántica de palabras  usando \nWord2vec y Fasttext mediante las  técnicas de reducción de dimensionalidad y visualización \naplicadas a embeddings distribucionales obtenidos a partir del corpus spanish word billion  \nLa práctica busca analizar cómo las palabras se relacionan  semánticamente  usando la \nsimilaridad distribucional  y de qué manera pueden agruparse en espacios vectoriales \nutilizando métodos matemáticos como el Análisis de Componentes Principales (PCA) y \nt-Distributed Stochastic Neighbor Embedd",
+    "chunk_size": 1000
+  },
+  {
+    "filename": "Taller #1. Datasets, tokenización y embeddings-sistemas.pdf",
+    "chunk_id": 4,
+    "text": "d distribucional  y de qué manera pueden agruparse en espacios vectoriales \nutilizando métodos matemáticos como el Análisis de Componentes Principales (PCA) y \nt-Distributed Stochastic Neighbor Embedding (t-SNE). \nActividades propuestas \n1.​ Cargar y preprocesar el dataset  spanish word billion  (usar streaming=True, ésta es \nuna posibilidad para usar todo el dataset)   \n2.​ Preprocesar  cada sentencia del dataset para que quede una lista de listas de \npalabras para usar GENSIM. La idea es que éstas sentencias queden limpias de \npuntuaciones, palabras stop words, números  y filtrado de tokens vacíos. [‘raul’, ‘ ’] \n3.​ Entrenamiento de los modelos Word2Vec y Fasttext con el embeddings de 300 y \nlas sentencias del dataset. \n4.​ Visualizar relaciones semánticas usando PCA y t-SNE para conjuntos de  100, 5000 \ny 10000 sentencias  para los dos modelos de  Word2Vec y Fasttext \n5.​ Comparar el comportamiento de ambos algoritmos de reducción de dimensionalidad \nen términos de los conjuntos de",
+    "chunk_size": 1000
+  },
+  {
+    "filename": "Taller #1. Datasets, tokenización y embeddings-sistemas.pdf",
+    "chunk_id": 5,
+    "text": "tos de  100, 5000 \ny 10000 sentencias  para los dos modelos de  Word2Vec y Fasttext \n5.​ Comparar el comportamiento de ambos algoritmos de reducción de dimensionalidad \nen términos de los conjuntos de sentencias y estructura global y local para \nWord2vec y Fasttext \n\n6.​ Analizar vecindarios semánticos de palabras en español con respecto a los dos \nmodelos, la idea es la de encontrar las 10 palabras más similares y visualizarlas en \nel plano cartesiano.  \n \n \n \nNota: Se debe explicar cómo la calidad del chunking influye directamente en la \nprecisión de los sistemas de recuperación semántica basados en embeddings, \nusando la ley de cosenos. \n \n \n3. El objetivo de éste ejercicio es procesar documentos en formato  pdf, generar \nrepresentaciones vectoriales (embeddings) de sus fragmentos textuales utilizando modelos \nde Sentence Transformers de Hugging Face y comparar el desempeño de distintos modelos \nen tareas de recuperación semántica de información mediante similitud coseno. \nLa prácti",
+    "chunk_size": 1000
+  },
+  {
+    "filename": "Taller #1. Datasets, tokenización y embeddings-sistemas.pdf",
+    "chunk_id": 6,
+    "text": "ales utilizando modelos \nde Sentence Transformers de Hugging Face y comparar el desempeño de distintos modelos \nen tareas de recuperación semántica de información mediante similitud coseno. \nLa práctica permitirá analizar cómo diferentes modelos de embeddings representan el \nsignificado semántico de los textos y cómo dichas representaciones impactan la calidad de \nla recuperación de información. \n \n\n  \nActividades propuestas \n \n1. Carga y preprocesamiento de los documentos en pdf: \nPara la extracción de texto se debe utilizar LangChain junto con  pymupdf4llm \n(recomendado por su mejor preservación del layout, estructura y contenido textual). El \nproceso debe cargar automáticamente todos los archivos PDF del directorio y extraer el \ncontenido textual de cada documento. \n2.   Fragmentación del texto (Chunking) \nUna vez extraído el contenido de los documentos, se debe realizar un proceso de \nfragmentación (chunking) del texto. \nEl objetivo es dividir cada documento en fragmentos de tamaño",
+    "chunk_size": 1000
+  },
+  {
+    "filename": "Taller #1. Datasets, tokenización y embeddings-sistemas.pdf",
+    "chunk_id": 7,
+    "text": "el texto (Chunking) \nUna vez extraído el contenido de los documentos, se debe realizar un proceso de \nfragmentación (chunking) del texto. \nEl objetivo es dividir cada documento en fragmentos de tamaño razonable que: \n●​ mantengan coherencia semántica, \n●​ preserven el significado contextual, \n●​ y permitan una recuperación eficiente de información. \nSe debe aplicar un fragmentador de texto apropiado, por ejemplo: \n●​ RecursiveCharacterTextSplitter \nLa configuración del chunking debe justificarse adecuadamente, considerando parámetros \ncomo: \n●​ tamaño del fragmento (chunk_size=1000), \n●​ solapamiento (chunk_overlap=200), \n3. Generación de embeddings  de oraciones \nUtilizar la biblioteca Sentence Transformers para generar representaciones vectoriales de \ncada fragmento textual obtenido en el paso anterior. \nSe deben evaluar los siguientes modelos de embeddings: \n \n \n \n \n \n \n\n \nModelo \nDimensiones \nFortalezas \nintfloat/multilingual-e5-base \n768 \nMuy buen balance \nprecisión/rendimiento \ns",
+    "chunk_size": 1000
+  },
+  {
+    "filename": "Taller #1. Datasets, tokenización y embeddings-sistemas.pdf",
+    "chunk_id": 8,
+    "text": "l paso anterior. \nSe deben evaluar los siguientes modelos de embeddings: \n \n \n \n \n \n \n\n \nModelo \nDimensiones \nFortalezas \nintfloat/multilingual-e5-base \n768 \nMuy buen balance \nprecisión/rendimiento \nsentence-transformers/para\nphrase-multilin \ngual-mpnet-base-v2 \n \n768 \nSimilaridad semántica de \nalta calidad \n \nBAAI/bge-m3 \n1024 \nExcelente retrieval \nsemántico \nsentence-transformers/para\nphrase-multilin \ngual-MiniLM-L12-v2 \n \n384 \nMuy rápido y ligero \n \nPara cada modelo se debe: \n1.​ cargar el modelo correspondiente, \n2.​ generar embeddings para todos los fragmentos, \n3.​ almacenar las representaciones vectoriales resultantes, \n4. Consulta de similitud semántica \nDefinir una oración de consulta, ya sea: \n●​ ingresada por el usuario, \n●​ o definida directamente en el código. \nPara cada uno de los cuatro modelos: \n1.​ generar el embedding de la consulta, \n2.​ calcular la similitud coseno entre la consulta y el resto de fragmentos \n3.​ identificar el fragmento más semánticamente similar. \n",
+    "chunk_size": 1000
+  },
+  {
+    "filename": "Taller #1. Datasets, tokenización y embeddings-sistemas.pdf",
+    "chunk_id": 9,
+    "text": "e los cuatro modelos: \n1.​ generar el embedding de la consulta, \n2.​ calcular la similitud coseno entre la consulta y el resto de fragmentos \n3.​ identificar el fragmento más semánticamente similar. \n5. Visualización en PCA y Tsne \nPara cada modelo: \n1.​ seleccionar: \n○​ la oración de consulta, \n○​ y el fragmento más similar recuperado mediante similitud coseno; \n2.​ generar una gráfica en el plano cartesiano que muestre: \n○​ la posición de la oración de consulta, \n○​ y la posición del fragmento recuperado. \n\nLa visualización debe cumplir con las siguientes características: \n●​ la consulta debe destacarse visualmente (por ejemplo, en rojo), \n●​ el fragmento más similar debe representarse con otro color (azul o verde), \n●​ cada gráfica debe incluir: \n○​ título, \n○​ leyenda, \n○​ etiquetas descriptivas, \n○​ y el nombre del modelo utilizado. \nFinalmente, se debe interpretar visualmente: \n●​ la cercanía entre embeddings, \n●​ la separación semántica entre conceptos, \n●​ y las diferencias obs",
+    "chunk_size": 1000
+  },
+  {
+    "filename": "Taller #1. Datasets, tokenización y embeddings-sistemas.pdf",
+    "chunk_id": 10,
+    "text": "scriptivas, \n○​ y el nombre del modelo utilizado. \nFinalmente, se debe interpretar visualmente: \n●​ la cercanía entre embeddings, \n●​ la separación semántica entre conceptos, \n●​ y las diferencias observadas entre modelos de embeddings. \n \n \n \n",
+    "chunk_size": 244
+  }
+]

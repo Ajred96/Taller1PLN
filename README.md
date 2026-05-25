@@ -1,134 +1,385 @@
-# POS Tagging en Espanol
+# Taller 2 - Datasets, Tokenización y Embeddings
 
-Proyecto del curso de **Procesamiento de Lenguaje Natural** (Univalle).
-Implementa un sistema de **POS Tagging** utilizando modelos basados en
-**BiLSTM** sobre datasets en espanol.
+## Integrantes
+
+- Cristian Camilo Llanos Alvarez - 1943852
+- Anderson Johan Alban Angulo - 2310006
+- Gustavo Adolfo Arango Nieves - 2310133
+- Juan Esteban Clavijo García - 2225709
+- Jhoan Felipe Leon Correa - 2228527
 
 ---
+
+# Introducción
+
+El objetivo de este taller es analizar diferentes estrategias modernas utilizadas en Procesamiento de Lenguaje Natural (
+PLN), incluyendo:
+
+- Tokenización con WordPiece y SentencePiece.
+- Entrenamiento de embeddings distribucionales usando Word2Vec y FastText.
+- Visualización semántica mediante PCA y t-SNE.
+- Recuperación semántica basada en embeddings utilizando Sentence Transformers.
+- Procesamiento y fragmentación de documentos PDF para sistemas de búsqueda semántica.
+
+El desarrollo del proyecto fue dividido entre los integrantes del grupo para modularizar cada componente del pipeline.
+
+---
+
+# Estado actual del proyecto
+
+Actualmente se encuentra implementada la fase de:
+
+# Preprocesamiento y preparación de datos
+
+Esta fase corresponde a la base del pipeline y prepara todos los recursos que serán utilizados posteriormente por los
+demás integrantes del grupo.
+
+---
+
+# Estructura del proyecto
+
+```plaintext
+Proyecto/
+│
+├── requirements.txt
+├── srcTaller2/
+│
+├── preprocessing/
+│   ├── datasets.py
+│   ├── text_cleaning.py
+│   ├── pdf_loader.py
+│   ├── chunking.py
+│   └── main_preprocessing.py
+│
+├── outputs/
+│   ├── processed/
+│   ├── chunks/
+│   └── reports/
+│
+└── data/
+    └── raw/
+        ├── ancora/
+        ├── conll2002/
+        └── pdfs/
+```
+
+---
+
+# Funcionalidades implementadas
+
+## 1. Carga de datasets
+
+Se implementó la carga de:
+
+- CoNLL2002
+- Ancora
+
+### CoNLL2002
+
+Se utilizaron directamente los conjuntos originales:
+
+- train
+- validation
+- test
+
+### Ancora
+
+Se realizó una división manual del dataset:
+
+- 70% entrenamiento
+- 15% validación
+- 15% prueba
+
+utilizando `train_test_split` de Scikit-Learn.
+
+---
+
+# 2. Exportación de datasets procesados
+
+El sistema genera automáticamente:
+
+```plaintext
+srcTaller2/outputs/processed/
+```
+
+Archivos generados:
+
+```plaintext
+conll2002_splits.json
+ancora_splits.json
+conll2002_first_3.json
+ancora_first_3.json
+```
+
+Estos archivos contienen:
+
+- conjuntos train/validation/test,
+- primeras 3 oraciones,
+- estructuras listas para tokenización.
+
+---
+
+# 3. Preprocesamiento textual
+
+Se implementó limpieza de texto para preparar sentencias destinadas a:
+
+- Word2Vec
+- FastText
+- Gensim
+
+## Limpieza aplicada
+
+- Conversión a minúsculas
+- Eliminación de puntuación
+- Eliminación de números
+- Eliminación de stopwords
+- Eliminación de tokens vacíos
+
+Ejemplo:
+
+```python
+["Hola", ",", "Mundo", "2025"]
+```
+
+Resultado:
+
+```python
+["hola", "mundo"]
+```
+
+---
+
+# 4. Carga de Spanish Billion Words
+
+Se implementó la carga del corpus:
+
+```plaintext
+crscardellino/spanish_billion_words
+```
+
+usando HuggingFace Datasets.
+
+El dataset fue procesado para generar:
+
+```python
+list[list[str]]
+```
+
+listas de tokens compatibles con:
+
+- Gensim
+- Word2Vec
+- FastText
+
+Ejemplo:
+
+```python
+[
+    ["familia", "dashwood", "llevaba"],
+    ["propiedad", "buen", "tamaño"]
+]
+```
+
+---
+
+# 5. Procesamiento de PDFs
+
+Se implementó carga automática de documentos PDF desde:
+
+```plaintext
+data/raw/pdfs/
+```
+
+utilizando:
+
+```python
+PyMuPDF(fitz)
+```
+
+## Funcionalidades
+
+- detección automática de PDFs,
+- extracción de texto,
+- lectura multipágina,
+- consolidación del contenido textual.
+
+---
+
+# 6. Chunking de documentos
+
+Se implementó fragmentación de documentos para recuperación semántica.
+
+## Configuración utilizada
+
+```python
+chunk_size = 1000
+chunk_overlap = 200
+```
 
 ## Objetivo
 
-Construir y evaluar modelos de etiquetado gramatical (Part-of-Speech Tagging)
-para espanol utilizando los datasets **Ancora** y **CoNLL2002**.
+La fragmentación permite:
 
----
+- preservar contexto semántico,
+- mejorar recuperación basada en embeddings,
+- facilitar búsqueda semántica.
 
-## Modelos implementados
+Cada chunk contiene:
 
-| Modelo | Descripcion |
-|--------|-------------|
-| **BiLSTM Base** | Embedding + BiLSTM + FC |
-| **BiLSTM Deep** | Embedding + BiLSTM + Dense + ReLU + Dropout + FC |
-| **BiLSTM-CRF** | Embedding + BiLSTM + FC + CRF (decodificacion Viterbi) |
-
-Cada modelo se entrena con **grid search de 24 combinaciones** de hiperparametros
-(batch_size, optimizer, embedding_dim, hidden_dim) con early stopping.
-
----
-
-## Datasets
-
-| Metrica | Ancora | CoNLL2002 |
-|---------|--------|-----------|
-| Train sentences | 12,141 | 8,323 |
-| Val sentences | 2,602 | 1,915 |
-| Test sentences | 2,602 | 1,517 |
-| Vocabulario palabras | 36,131 | 26,101 |
-| Etiquetas POS | 17 (universales) | 61 (EAGLES) |
-| Max sequence length | 148 | 1,238 |
-
-**Nota:** Los esquemas de etiquetas son incompatibles entre si.
-Ancora usa etiquetas universales (`NOUN`, `VERB`, `DET`) mientras que
-CoNLL2002 usa etiquetas EAGLES (`NC`, `VMI`, `DA`).
-
----
-
-## Estructura del proyecto
-
-```
-Taller1PLN/
-|-- main.py                 <- Menu principal
-|-- config.py               <- Paths centralizados
-|-- requirements.txt        <- Dependencias
-|
-|-- data/raw/               <- Datasets crudos
-|   |-- ancora/             <- ancora_corpus_pos.csv
-|   |-- conll2002/          <- train.txt, valid.txt, test.txt
-|
-|-- src/
-|   |-- preprocessing/      <- Carga, limpieza, vocabularios, DataLoaders
-|   |   |-- utils.py        <- Funciones compartidas (vocab, encode, pad, split)
-|   |   |-- ancora.py       <- Pipeline completo Ancora
-|   |   |-- conll.py        <- Pipeline completo CoNLL2002
-|   |   |-- export.py       <- Exportar datos procesados a .pt
-|   |
-|   |-- training/           <- Entrenamiento de modelos
-|   |   |-- bilstm_base/    <- model, train, predict, grid_search
-|   |   |-- bilstm_deep/    <- model, train, predict, grid_search
-|   |   |-- bilstm_crf/     <- model, train, predict, grid_search
-|   |
-|   |-- inference/          <- Uso de modelos para etiquetar texto
-|       |-- tagger.py       <- Cargar modelos y etiquetar oraciones
-|
-|-- outputs/
-    |-- artifacts/          <- Vocabularios JSON
-    |-- models/             <- Modelos entrenados (.pt)
-    |-- processed/          <- Datos serializados (.pt)
-    |-- reports/            <- Reportes de evaluacion
+```json
+{
+  "filename": "...",
+  "chunk_id": 0,
+  "text": "...",
+  "chunk_size": 1000
+}
 ```
 
 ---
 
-## Como ejecutar
+# Archivos generados
+
+## Chunks
+
+```plaintext
+srcTaller2/outputs/chunks/pdf_chunks.json
+```
+
+## Reportes
+
+```plaintext
+srcTaller2/outputs/reports/preprocessing_summary.txt
+```
+
+---
+
+# Dependencias utilizadas
+
+Instalación:
 
 ```bash
-# Crear entorno virtual e instalar dependencias
-python3 -m venv .venv
-source .venv/bin/activate
 pip install -r requirements.txt
-
-# Ejecutar el menu principal
-python main.py
 ```
 
-### Opciones del menu
+Dependencias principales:
 
-| Opcion | Descripcion |
-|--------|-------------|
-| **1a-1c** | Preprocesar Ancora, CoNLL o ambos |
-| **1d** | Exportar datos procesados (.pt) |
-| **2a** | Entrenar BiLSTM Base (Ancora + CoNLL) |
-| **2b** | Entrenar BiLSTM Deep (Ancora + CoNLL) |
-| **2c** | Entrenar BiLSTM-CRF (Ancora + CoNLL) |
-| **3a** | Etiquetar oraciones (modo interactivo) |
-| **3b** | Ver modelos disponibles |
-
-### Orden de ejecucion para un pipeline completo
-
-1. `1c` - Preprocesar ambos datasets
-2. `1d` - Exportar datos procesados
-3. `2a`, `2b`, `2c` - Entrenar modelos
-4. `3a` - Etiquetar oraciones
+```plaintext
+pandas
+numpy
+scikit-learn
+nltk
+datasets
+pymupdf
+sentence-transformers
+gensim
+matplotlib
+```
 
 ---
 
-## Reportes generados
+# Cómo ejecutar el preprocesamiento
 
-Al entrenar cada modelo se generan automaticamente:
+Desde la raíz del proyecto:
 
-- **Reporte individual** por modelo y dataset (`outputs/reports/bilstm_ancora_report.txt`)
-  con metricas globales, metricas por etiqueta y detalle del grid search.
-- **Tabla comparativa global** (`outputs/reports/tabla_comparativa_global.txt`)
-  con todos los modelos entrenados.
-
-Formato de la tabla:
-
+```bash
+python -m srcTaller2.main_preprocessing
 ```
-Modelo       | Dataset   | Accuracy | Precision | Recall | F1-Score
-BiLSTM       | Ancora    | 0.XXXX   | 0.XXXX    | 0.XXXX | 0.XXXX
-BiLSTM+Dense | Ancora    | 0.XXXX   | 0.XXXX    | 0.XXXX | 0.XXXX
-BiLSTM-CRF   | Ancora    | 0.XXXX   | 0.XXXX    | 0.XXXX | 0.XXXX
-BiLSTM       | CoNLL2002 | 0.XXXX   | 0.XXXX    | 0.XXXX | 0.XXXX
-BiLSTM+Dense | CoNLL2002 | 0.XXXX   | 0.XXXX    | 0.XXXX | 0.XXXX
-BiLSTM-CRF   | CoNLL2002 | 0.XXXX   | 0.XXXX    | 0.XXXX | 0.XXXX
+
+---
+
+# Flujo actual del pipeline
+
+```plaintext
+Carga datasets
+      ↓
+Preprocesamiento texto
+      ↓
+Spanish Billion Words
+      ↓
+Carga PDFs
+      ↓
+Extracción texto
+      ↓
+Chunking
+      ↓
+Exportación JSON
 ```
+
+---
+
+# Salidas disponibles para los demás integrantes
+
+Los siguientes archivos deben ser utilizados por los siguientes módulos del proyecto:
+
+## Tokenización
+
+Archivos:
+
+```plaintext
+conll2002_first_3.json
+ancora_first_3.json
+```
+
+Uso:
+
+- WordPiece
+- SentencePiece
+
+---
+
+## Embeddings distribucionales
+
+Archivo fuente:
+
+```plaintext
+Spanish Billion Words procesado
+```
+
+Uso:
+
+- Word2Vec
+- FastText
+- PCA
+- t-SNE
+
+---
+
+## Recuperación semántica
+
+Archivo:
+
+```plaintext
+pdf_chunks.json
+```
+
+Uso:
+
+- Sentence Transformers
+- Embeddings semánticos
+- Similaridad coseno
+- Retrieval semántico
+
+---
+
+# Estado actual
+
+## Completado
+
+- Preprocesamiento datasets
+- Limpieza textual
+- Spanish Billion Words
+- PDFs
+- Chunking
+- Exportación JSON
+
+## Pendiente
+
+- WordPiece
+- SentencePiece
+- Word2Vec
+- FastText
+- PCA
+- t-SNE
+- Sentence Transformers
+- Semantic Search
+- Visualización embeddings
