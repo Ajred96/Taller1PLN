@@ -283,6 +283,20 @@ Desde la raíz del proyecto:
 
 ```bash
 python -m srcTaller2.main_preprocessing
+
+```
+#cómo ejecutar tokenización con t5-small(sentecePiece)
+
+Desde Taller1PLN\srcTaller2:
+
+```bash
+pip install transformers huggingface_hub pandas
+
+python tokenization_t5-small.py
+
+```
+---
+
 ```
 
 ---
