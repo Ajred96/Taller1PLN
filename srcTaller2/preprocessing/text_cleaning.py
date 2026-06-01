@@ -137,21 +137,28 @@ def print_cleaning_example(sentences, n=3):
 # Spanish Billion Words / datasets streaming
 # ============================================================
 
-def load_text_dataset(dataset_name, split="train", streaming=False, trust_remote_code=True, ):
+# El dataset original usa un script .py que datasets>=3 ya no soporta.
+# Equivalente en Parquet (misma columna "text").
+_SPANISH_BILLION_WORDS_PARQUET = "lauravalero/spanish_billion_words_clean"
+
+
+def load_text_dataset(dataset_name, split="train", streaming=False):
     """
     Carga un dataset de texto desde Hugging Face.
     """
-
     from datasets import load_dataset
 
-    dataset = load_dataset(
+    if dataset_name == "crscardellino/spanish_billion_words":
+        dataset_name = _SPANISH_BILLION_WORDS_PARQUET
+        # Evita descargar ~5 GB si solo se procesan pocas oraciones.
+        if not streaming:
+            streaming = True
+
+    return load_dataset(
         dataset_name,
         split=split,
         streaming=streaming,
-        trust_remote_code=trust_remote_code,
     )
-
-    return dataset
 
 
 def preprocess_streaming_dataset(dataset, text_column="text", max_sentences=1000, ):

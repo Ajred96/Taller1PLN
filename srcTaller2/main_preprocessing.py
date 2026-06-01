@@ -27,7 +27,7 @@ def run_spanish_text_preprocessing():
 
     dataset = load_text_dataset(
         dataset_name="crscardellino/spanish_billion_words",
-        streaming=False,
+        streaming=True,
     )
 
     processed_sentences = preprocess_streaming_dataset(
