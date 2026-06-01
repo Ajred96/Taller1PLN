@@ -184,13 +184,13 @@ Ejemplo:
 
 # 5. Procesamiento de PDFs
 
-Se implementó carga automática de documentos PDF desde:
+Se implementó la carga automática de documentos PDF desde:
 
 ```plaintext
 data/raw/pdfs/
 ```
 
-utilizando:
+Para la extracción de texto se utilizó:
 
 ```python
 PyMuPDF(fitz)
@@ -198,16 +198,24 @@ PyMuPDF(fitz)
 
 ## Funcionalidades
 
-- detección automática de PDFs,
-- extracción de texto,
+- detección automática de archivos PDF,
+- extracción de texto por página,
 - lectura multipágina,
-- consolidación del contenido textual.
+- consolidación del contenido textual de cada documento.
 
 ---
 
-# 6. Chunking de documentos
+# 6. Chunking de documentos con LangChain
 
-Se implementó fragmentación de documentos para recuperación semántica.
+Se implementó la fragmentación de documentos para recuperación semántica utilizando `RecursiveCharacterTextSplitter` del
+ecosistema LangChain, mediante el paquete:
+
+```plaintext
+langchain-text-splitters
+```
+
+Esta decisión permite cumplir con la recomendación del taller, manteniendo una instalación más ligera y estable que el
+paquete completo de LangChain.
 
 ## Configuración utilizada
 
@@ -216,24 +224,65 @@ chunk_size = 1000
 chunk_overlap = 200
 ```
 
+## Fragmentador utilizado
+
+```python
+RecursiveCharacterTextSplitter
+```
+
 ## Objetivo
 
 La fragmentación permite:
 
-- preservar contexto semántico,
-- mejorar recuperación basada en embeddings,
-- facilitar búsqueda semántica.
+- mantener coherencia semántica,
+- preservar parte del contexto entre fragmentos mediante solapamiento,
+- mejorar la recuperación basada en embeddings,
+- facilitar búsquedas semánticas posteriores con Sentence Transformers.
 
-Cada chunk contiene:
+Cada chunk generado contiene:
 
 ```json
 {
   "filename": "...",
   "chunk_id": 0,
   "text": "...",
-  "chunk_size": 1000
+  "chunk_size": 968,
+  "splitter": "RecursiveCharacterTextSplitter",
+  "chunk_size_config": 1000,
+  "chunk_overlap_config": 200
 }
 ```
+
+En la última ejecución del pipeline se procesaron:
+
+- 12 documentos PDF,
+- 6796 chunks generados.
+
+---
+
+# Estado actual
+
+## Completado
+
+- Preprocesamiento datasets
+- Limpieza textual
+- Spanish Billion Words
+- Carga automática de PDFs
+- Extracción de texto con PyMuPDF
+- Chunking con RecursiveCharacterTextSplitter
+- Exportación JSON
+
+## Pendiente
+
+- WordPiece
+- SentencePiece
+- Word2Vec
+- FastText
+- PCA
+- t-SNE
+- Sentence Transformers
+- Semantic Search
+- Visualización embeddings
 
 ---
 
@@ -358,28 +407,3 @@ Uso:
 - Embeddings semánticos
 - Similaridad coseno
 - Retrieval semántico
-
----
-
-# Estado actual
-
-## Completado
-
-- Preprocesamiento datasets
-- Limpieza textual
-- Spanish Billion Words
-- PDFs
-- Chunking
-- Exportación JSON
-
-## Pendiente
-
-- WordPiece
-- SentencePiece
-- Word2Vec
-- FastText
-- PCA
-- t-SNE
-- Sentence Transformers
-- Semantic Search
-- Visualización embeddings
