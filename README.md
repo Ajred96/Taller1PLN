@@ -27,12 +27,10 @@ El desarrollo del proyecto fue dividido entre los integrantes del grupo para mod
 
 # Estado actual del proyecto
 
-Actualmente se encuentra implementada la fase de:
+Actualmente se encuentran implementadas las fases de:
 
-# Preprocesamiento y preparación de datos
-
-Esta fase corresponde a la base del pipeline y prepara todos los recursos que serán utilizados posteriormente por los
-demás integrantes del grupo.
+- Preprocesamiento y preparación de datos
+- Recuperación semántica con Sentence Transformers
 
 ---
 
@@ -41,26 +39,50 @@ demás integrantes del grupo.
 ```plaintext
 Proyecto/
 │
+├── README.md
 ├── requirements.txt
-├── srcTaller2/
+├── taller2_integrante5.ipynb
 │
-├── preprocessing/
-│   ├── datasets.py
-│   ├── text_cleaning.py
-│   ├── pdf_loader.py
-│   ├── chunking.py
-│   └── main_preprocessing.py
-│
-├── outputs/
-│   ├── processed/
-│   ├── chunks/
-│   └── reports/
-│
-└── data/
-    └── raw/
-        ├── ancora/
-        ├── conll2002/
-        └── pdfs/
+└── srcTaller2/
+    │
+    ├── preprocessing/
+    │   ├── datasets.py
+    │   ├── text_cleaning.py
+    │   ├── pdf_loader.py
+    │   ├── chunking.py
+    │   └── main_preprocessing.py
+    │
+    ├── embeddings/
+    │   ├── sentence_transformers_embeddings.py
+    │   ├── semantic_search.py
+    │   ├── visualization.py
+    │   └── main_embeddings.py
+    │
+    └── outputs/
+        ├── processed/
+        │   ├── conll2002_splits.json
+        │   ├── ancora_splits.json
+        │   ├── conll2002_first_3.json
+        │   └── ancora_first_3.json
+        ├── chunks/
+        │   └── pdf_chunks.json
+        ├── embeddings/
+        │   ├── embeddings_e5.npy
+        │   ├── embeddings_mpnet.npy
+        │   ├── embeddings_bge.npy
+        │   ├── embeddings_minilm.npy
+        │   └── visualizations/
+        │       ├── comparacion_scores.png
+        │       ├── pca_e5.png
+        │       ├── pca_mpnet.png
+        │       ├── pca_bge.png
+        │       ├── pca_minilm.png
+        │       ├── t-sne_e5.png
+        │       ├── t-sne_mpnet.png
+        │       ├── t-sne_bge.png
+        │       └── t-sne_minilm.png
+        └── reports/
+            └── preprocessing_summary.txt
 ```
 
 ---
@@ -260,6 +282,60 @@ En la última ejecución del pipeline se procesaron:
 
 ---
 
+## 7. Recuperación semántica con Sentence Transformers
+
+Se implementó un pipeline completo de recuperación semántica sobre los chunks generados en el paso anterior.
+
+### Modelos evaluados
+
+| ID     | Modelo                                | Dimensiones | Fortaleza                   |
+| ------ | ------------------------------------- | ----------- | --------------------------- |
+| e5     | intfloat/multilingual-e5-base         | 768         | Balance precisión/velocidad |
+| mpnet  | paraphrase-multilingual-mpnet-base-v2 | 768         | Alta calidad semántica      |
+| bge    | BAAI/bge-m3                           | 1024        | Mejor retrieval semántico   |
+| minilm | paraphrase-multilingual-MiniLM-L12-v2 | 384         | Rápido y ligero             |
+
+### Proceso
+
+Para cada modelo se:
+
+1. descargó el modelo desde HuggingFace Hub,
+2. generaron embeddings para los 6796 chunks con `normalize_embeddings=True`,
+3. almacenaron los vectores como archivos `.npy`,
+4. calculó la similitud coseno entre una consulta y todos los fragmentos,
+5. identificó el fragmento más similar.
+
+### Consulta de ejemplo utilizada
+
+```
+"El coronel recordó su pasado mientras enfrentaba la muerte"
+```
+
+### Resultados de similitud coseno
+
+| Modelo | Score  | Archivo recuperado |
+| ------ | ------ | ------------------ |
+| e5     | 0.8422 | coronel-no.pdf     |
+| mpnet  | 0.7514 | coronel-no.pdf     |
+| bge    | 0.5940 | coronel-no.pdf     |
+| minilm | 0.6894 | coronel-no.pdf     |
+
+### Visualización
+
+Para cada modelo se generaron gráficas PCA y t-SNE mostrando:
+
+- la posición de la consulta (rojo),
+- el fragmento más similar (azul),
+- una muestra de 500 chunks de fondo (gris).
+
+Las visualizaciones están disponibles en:
+
+```plaintext
+srcTaller2/outputs/embeddings/visualizations/
+```
+
+---
+
 # Estado actual
 
 ## Completado
@@ -271,6 +347,10 @@ En la última ejecución del pipeline se procesaron:
 - Extracción de texto con PyMuPDF
 - Chunking con RecursiveCharacterTextSplitter
 - Exportación JSON
+- Generación de embeddings con 4 modelos de Sentence Transformers
+- Recuperación semántica por similitud coseno
+- Visualización PCA y t-SNE
+- Comparación entre modelos de embeddings
 
 ## Pendiente
 
@@ -278,11 +358,6 @@ En la última ejecución del pipeline se procesaron:
 - SentencePiece
 - Word2Vec
 - FastText
-- PCA
-- t-SNE
-- Sentence Transformers
-- Semantic Search
-- Visualización embeddings
 
 ---
 
@@ -292,6 +367,29 @@ En la última ejecución del pipeline se procesaron:
 
 ```plaintext
 srcTaller2/outputs/chunks/pdf_chunks.json
+```
+
+## Embeddings
+
+```plaintext
+srcTaller2/outputs/embeddings/embeddings_e5.npy
+srcTaller2/outputs/embeddings/embeddings_mpnet.npy
+srcTaller2/outputs/embeddings/embeddings_bge.npy
+srcTaller2/outputs/embeddings/embeddings_minilm.npy
+```
+
+## Visualizaciones
+
+```plaintext
+srcTaller2/outputs/embeddings/visualizations/comparacion_scores.png
+srcTaller2/outputs/embeddings/visualizations/pca_e5.png
+srcTaller2/outputs/embeddings/visualizations/pca_mpnet.png
+srcTaller2/outputs/embeddings/visualizations/pca_bge.png
+srcTaller2/outputs/embeddings/visualizations/pca_minilm.png
+srcTaller2/outputs/embeddings/visualizations/t-sne_e5.png
+srcTaller2/outputs/embeddings/visualizations/t-sne_mpnet.png
+srcTaller2/outputs/embeddings/visualizations/t-sne_bge.png
+srcTaller2/outputs/embeddings/visualizations/t-sne_minilm.png
 ```
 
 ## Reportes
@@ -322,6 +420,8 @@ pymupdf
 sentence-transformers
 gensim
 matplotlib
+seaborn
+tqdm
 ```
 
 ---
@@ -332,20 +432,36 @@ Desde la raíz del proyecto:
 
 ```bash
 python -m srcTaller2.main_preprocessing
-
 ```
-#cómo ejecutar tokenización con t5-small(sentecePiece)
 
-Desde Taller1PLN\srcTaller2:
+# Cómo ejecutar tokenización con t5-small (SentencePiece)
+
+Desde `Taller1PLN\srcTaller2`:
 
 ```bash
 pip install transformers huggingface_hub pandas
 
 python tokenization_t5-small.py
-
 ```
----
 
+# Cómo ejecutar el pipeline de embeddings semánticos
+
+Desde la raíz del proyecto:
+
+```bash
+python -m srcTaller2.embeddings.main_embeddings
+```
+
+Con consulta personalizada:
+
+```bash
+python -m srcTaller2.embeddings.main_embeddings --consulta "tu frase aquí"
+```
+
+Para forzar la regeneración de embeddings aunque existan en disco:
+
+```bash
+python -m srcTaller2.embeddings.main_embeddings --regenerar
 ```
 
 ---
@@ -366,6 +482,12 @@ Extracción texto
 Chunking
       ↓
 Exportación JSON
+      ↓
+Generación de embeddings (4 modelos)
+      ↓
+Recuperación semántica (similitud coseno)
+      ↓
+Visualización PCA y t-SNE
 ```
 
 ---
@@ -417,7 +539,7 @@ pdf_chunks.json
 
 Uso:
 
-- Sentence Transformers
-- Embeddings semánticos
-- Similaridad coseno
-- Retrieval semántico
+- Sentence Transformers ✔ (completado)
+- Embeddings semánticos ✔ (completado)
+- Similaridad coseno ✔ (completado)
+- Retrieval semántico ✔ (completado)
